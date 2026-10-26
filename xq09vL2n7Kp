@@ -1,0 +1,573 @@
+local Library = {}
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local Player = Players.LocalPlayer
+
+local CUSTOM_FONT
+pcall(function()
+    local fontUrl = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/BloodyGhost_PERSONAL_USE_ONLY.ttf"
+    if not isfile("bloodyghost.ttf") then
+        writefile("bloodyghost.ttf", game:HttpGet(fontUrl))
+    end
+    writefile("bloodyghost.json", HttpService:JSONEncode({
+        name = "BloodyGhost",
+        faces = {{name="Regular", weight=400, style="normal", assetId=getcustomasset("bloodyghost.ttf")}}
+    }))
+    CUSTOM_FONT = Font.new(getcustomasset("bloodyghost.json"))
+end)
+
+if not CUSTOM_FONT then 
+    CUSTOM_FONT = Font.fromEnum(Enum.Font.GothamBold) 
+end
+
+local function getGuiParent()
+	local pg = Player:FindFirstChildOfClass("PlayerGui")
+	if pg then return pg end
+	local ok, hui = pcall(function() return gethui() end)
+	if ok and hui then return hui end
+	local ok2, cg = pcall(function() return CoreGui end)
+	if ok2 and cg then return cg end
+	local ok3, pg2 = pcall(function() return Player:WaitForChild("PlayerGui", 5) end)
+	if ok3 and pg2 then return pg2 end
+	return nil
+end
+
+local WINDOW_IMAGE = "rbxassetid://108891211241290"
+local WINDOW_W, WINDOW_H = 210, 380
+local BUBBLE_SIZE = 46
+local CENTER = UDim2.new(0.5, 0, 0.5, 0)
+
+local PALETTE = {
+	PanelDark  = Color3.fromRGB(30, 14, 46),
+	Panel      = Color3.fromRGB(62, 34, 94),
+	PanelLight = Color3.fromRGB(92, 56, 136),
+	Stroke     = Color3.fromRGB(150, 104, 205),
+	TrackOff   = Color3.fromRGB(88, 62, 120),
+	Orange     = Color3.fromRGB(255, 146, 46),
+	OrangeSoft = Color3.fromRGB(255, 190, 112),
+	Cream      = Color3.fromRGB(255, 238, 214),
+	Muted      = Color3.fromRGB(190, 165, 220),
+}
+
+local function corner(parent, radius)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = radius
+	c.Parent = parent
+	return c
+end
+
+local function stroke(parent, color, thickness, transparency)
+	local s = Instance.new("UIStroke")
+	s.Color = color
+	s.Thickness = thickness
+	s.Transparency = transparency
+	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	s.Parent = parent
+	return s
+end
+
+local function tween(obj, info, props)
+	local t = TweenService:Create(obj, info, props)
+	t:Play()
+	return t
+end
+
+local function makeLabel(parent, text, size, color)
+	local l = Instance.new("TextLabel")
+	l.BackgroundTransparency = 1
+	l.Text = text
+	l.TextColor3 = color
+	l.TextSize = size
+	l.FontFace = CUSTOM_FONT
+	l.TextXAlignment = Enum.TextXAlignment.Left
+	l.Parent = parent
+	return l
+end
+
+function Library:CreateWindow(options)
+	options = options or {}
+	local guiParent = getGuiParent()
+	if not guiParent then warn("No se pudo encontrar un parent para la GUI.") return end
+
+	local name = options.Name or "MyWindow"
+	local old = guiParent:FindFirstChild(name)
+	if old then old:Destroy() end
+	local leftoverDeny = guiParent:FindFirstChild(name .. "_Denied")
+	if leftoverDeny then leftoverDeny:Destroy() end
+
+	local connections = {}
+	local function connect(signal, fn)
+		local c = signal:Connect(fn)
+		table.insert(connections, c)
+		return c
+	end
+
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = name
+	screenGui.ResetOnSpawn = false
+	screenGui.IgnoreGuiInset = true
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.DisplayOrder = 999999
+	screenGui.Parent = guiParent
+
+	local mainFrame = Instance.new("CanvasGroup")
+	mainFrame.Name = "MainFrame"
+	mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	mainFrame.Size = UDim2.fromOffset(WINDOW_W, WINDOW_H)
+	mainFrame.Position = CENTER
+	mainFrame.BackgroundTransparency = 1
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Active = true
+	mainFrame.Parent = screenGui
+
+	local mainScale = Instance.new("UIScale")
+	mainScale.Parent = mainFrame
+
+	local function getBaseScale()
+		local cam = workspace.CurrentCamera
+		if not cam then return 1 end
+		return math.clamp((cam.ViewportSize.Y - 24) / WINDOW_H, 0.5, 1)
+	end
+	local baseScale = getBaseScale()
+
+	local bg = Instance.new("ImageLabel")
+	bg.Name = "Background"
+	bg.Size = UDim2.fromScale(1, 1)
+	bg.BackgroundTransparency = 1
+	bg.Image = WINDOW_IMAGE
+	bg.ScaleType = Enum.ScaleType.Stretch
+	bg.Active = true
+	bg.ZIndex = 1
+	bg.Parent = mainFrame
+
+	local function makeHitButton(btnName, cx, cy, size)
+		local b = Instance.new("TextButton")
+		b.Name = btnName
+		b.AnchorPoint = Vector2.new(0.5, 0.5)
+		b.Position = UDim2.fromOffset(cx, cy)
+		b.Size = UDim2.fromOffset(size, size)
+		b.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		b.BackgroundTransparency = 1
+		b.Text = ""
+		b.AutoButtonColor = false
+		b.BorderSizePixel = 0
+		b.ZIndex = 10
+		b.Parent = mainFrame
+		corner(b, UDim.new(1, 0))
+
+		local press = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		connect(b.MouseButton1Down, function() tween(b, press, {BackgroundTransparency = 0.7}) end)
+		connect(b.MouseButton1Up, function() tween(b, press, {BackgroundTransparency = 1}) end)
+		connect(b.MouseLeave, function() tween(b, press, {BackgroundTransparency = 1}) end)
+		return b
+	end
+	
+	local minimizeBtn = makeHitButton("MinimizeHit", 167, 20.5, 22)
+	local closeBtn = makeHitButton("CloseHit", 191.5, 20.5, 22)
+
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Name = "Scroll"
+	scroll.Position = UDim2.fromOffset(14, 42)
+	scroll.Size = UDim2.fromOffset(182, 244)
+	scroll.BackgroundTransparency = 1
+	scroll.BorderSizePixel = 0
+	scroll.ScrollBarThickness = 3
+	scroll.ScrollBarImageColor3 = PALETTE.Orange
+	scroll.ScrollBarImageTransparency = 0.3
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scroll.ZIndex = 2
+	scroll.Parent = mainFrame
+
+	local content = Instance.new("Frame")
+	content.Size = UDim2.new(1, -8, 0, 0)
+	content.AutomaticSize = Enum.AutomaticSize.Y
+	content.BackgroundTransparency = 1
+	content.Parent = scroll
+
+	local contentLayout = Instance.new("UIListLayout")
+	contentLayout.Padding = UDim.new(0, 6)
+	contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	contentLayout.Parent = content
+
+	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 14, PALETTE.OrangeSoft)
+	titleLabel.Name = "Title"
+	titleLabel.Position = UDim2.fromOffset(16, 298)
+	titleLabel.Size = UDim2.fromOffset(112, 18)
+	titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	titleLabel.TextStrokeTransparency = 0.5
+	titleLabel.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+	titleLabel.ZIndex = 3
+
+	local watermark = makeLabel(mainFrame, options.Watermark or "", 11, PALETTE.Muted)
+	watermark.Name = "Watermark"
+	watermark.Position = UDim2.fromOffset(16, 318)
+	watermark.Size = UDim2.fromOffset(112, 26)
+	watermark.TextWrapped = true
+	watermark.TextYAlignment = Enum.TextYAlignment.Top
+	watermark.TextStrokeTransparency = 0.6
+	watermark.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+	watermark.ZIndex = 3
+
+	local bubble = Instance.new("TextButton")
+	bubble.Name = "MiniButton"
+	bubble.AnchorPoint = Vector2.new(0.5, 0.5)
+	bubble.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE)
+	bubble.Position = CENTER
+	bubble.BackgroundColor3 = PALETTE.Panel
+	bubble.Text = "M"
+	bubble.TextColor3 = PALETTE.Orange
+	bubble.TextSize = 20
+	bubble.FontFace = CUSTOM_FONT
+	bubble.AutoButtonColor = false
+	bubble.BorderSizePixel = 0
+	bubble.Active = true
+	bubble.Visible = false
+	bubble.ZIndex = 20
+	bubble.Parent = screenGui
+	corner(bubble, UDim.new(1, 0))
+	stroke(bubble, PALETTE.Orange, 2, 0.05)
+
+	local bubbleScale = Instance.new("UIScale")
+	bubbleScale.Scale = 0
+	bubbleScale.Parent = bubble
+
+	local function ripple(pos)
+		local r = Instance.new("Frame")
+		r.AnchorPoint = Vector2.new(0.5, 0.5)
+		r.Position = pos
+		r.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE)
+		r.BackgroundTransparency = 1
+		r.BorderSizePixel = 0
+		r.ZIndex = 19
+		r.Parent = screenGui
+		corner(r, UDim.new(1, 0))
+		local rs = stroke(r, PALETTE.Orange, 2, 0.15)
+		local info = TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		tween(r, info, {Size = UDim2.fromOffset(BUBBLE_SIZE * 2.4, BUBBLE_SIZE * 2.4)})
+		tween(rs, info, {Transparency = 1})
+		task.delay(0.65, function() r:Destroy() end)
+	end
+
+	local minimized, busy = false, false
+	local miniPos = nil 
+	local shrunk = BUBBLE_SIZE / WINDOW_W
+
+	local function collapse()
+		if minimized or busy then return end
+		busy = true
+		if not miniPos then miniPos = mainFrame.Position end
+		bubble.Position = miniPos
+
+		local t = 0.5
+		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = shrunk})
+		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut), {Position = miniPos, Rotation = 14})
+		tween(mainFrame, TweenInfo.new(0.32, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.16), {GroupTransparency = 1})
+		task.wait(t)
+
+		mainFrame.Visible = false
+		mainFrame.Rotation = 0
+
+		bubbleScale.Scale = 0
+		bubble.Visible = true
+		tween(bubbleScale, TweenInfo.new(0.55, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Scale = 1})
+		ripple(miniPos)
+
+		minimized = true
+		busy = false
+	end
+
+	local function expand()
+		if not minimized or busy then return end
+		busy = true
+		local pos = bubble.Position
+		miniPos = pos
+
+		tween(bubbleScale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0})
+		ripple(pos)
+
+		mainFrame.Position = pos
+		mainFrame.Rotation = -14
+		mainScale.Scale = shrunk
+		mainFrame.GroupTransparency = 1
+		mainFrame.Visible = true
+		task.wait(0.12)
+
+		local t = 0.65
+		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
+		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Rotation = 0})
+		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
+		tween(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
+		task.wait(0.22)
+		bubble.Visible = false
+		task.wait(t - 0.22)
+
+		minimized = false
+		busy = false
+	end
+
+	local function close()
+		if busy then return end
+		busy = true
+		tween(mainScale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = baseScale * 0.8})
+		tween(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {GroupTransparency = 1})
+		task.wait(0.32)
+		for _, c in ipairs(connections) do c:Disconnect() end
+		screenGui:Destroy()
+	end
+
+	connect(minimizeBtn.MouseButton1Click, collapse)
+	connect(closeBtn.MouseButton1Click, close)
+
+	busy = true
+	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 24)
+	mainFrame.GroupTransparency = 1
+	mainScale.Scale = baseScale * 0.85
+	tween(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
+	tween(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
+	tween(mainScale, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
+	task.delay(0.6, function() busy = false end)
+
+	local dragTarget, dragStart, dragOrigin, dragMoved, dragTap
+
+	local function beginDrag(input, target, onTap)
+		if busy then return end
+		if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
+		dragTarget, dragStart, dragOrigin = target, input.Position, target.Position
+		dragMoved, dragTap = false, onTap
+	end
+
+	connect(bg.InputBegan, function(input)
+		if not minimized then beginDrag(input, mainFrame, nil) end
+	end)
+	connect(bubble.InputBegan, function(input)
+		beginDrag(input, bubble, expand)
+	end)
+
+	connect(UserInputService.InputChanged, function(input)
+		if not dragTarget then return end
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			local delta = input.Position - dragStart
+			if delta.Magnitude > 4 then dragMoved = true end
+			if dragMoved then
+				dragTarget.Position = UDim2.new(
+					dragOrigin.X.Scale, dragOrigin.X.Offset + delta.X,
+					dragOrigin.Y.Scale, dragOrigin.Y.Offset + delta.Y
+				)
+			end
+		end
+	end)
+
+	connect(UserInputService.InputEnded, function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			if dragTarget then
+				if dragTarget == bubble then miniPos = bubble.Position end
+				local tap = (not dragMoved) and dragTap
+				dragTarget = nil
+				if tap then tap() end
+			end
+		end
+	end)
+
+	local hidden = false
+	connect(UserInputService.InputBegan, function(input, gp)
+		if gp then return end
+		if input.KeyCode == Enum.KeyCode.X then
+			hidden = not hidden
+			screenGui.Enabled = not hidden
+		elseif input.KeyCode == Enum.KeyCode.M and not hidden then
+			if minimized then expand() else collapse() end
+		end
+	end)
+
+	local cam = workspace.CurrentCamera
+	if cam then
+		connect(cam:GetPropertyChangedSignal("ViewportSize"), function()
+			baseScale = getBaseScale()
+			if not minimized and not busy then mainScale.Scale = baseScale end
+		end)
+	end
+
+	local WindowAPI = { LayoutOrder = 1 }
+
+	function WindowAPI:AddToggle(text, callback)
+		local row = Instance.new("TextButton")
+		row.Size = UDim2.new(1, 0, 0, 30)
+		row.BackgroundColor3 = PALETTE.Panel
+		row.BackgroundTransparency = 0.2
+		row.Text = ""
+		row.AutoButtonColor = false
+		row.BorderSizePixel = 0
+		row.LayoutOrder = self.LayoutOrder
+		row.Parent = content
+		self.LayoutOrder = self.LayoutOrder + 1
+		corner(row, UDim.new(0, 9))
+		local rowStroke = stroke(row, PALETTE.Stroke, 1, 0.6)
+
+		local label = makeLabel(row, text, 13, PALETTE.Cream)
+		label.Position = UDim2.fromOffset(10, 0)
+		label.Size = UDim2.new(1, -58, 1, 0)
+		label.TextTruncate = Enum.TextTruncate.AtEnd
+
+		local track = Instance.new("Frame")
+		track.Size = UDim2.fromOffset(30, 16)
+		track.Position = UDim2.new(1, -40, 0.5, -8)
+		track.BackgroundColor3 = PALETTE.TrackOff
+		track.BorderSizePixel = 0
+		track.Parent = row
+		corner(track, UDim.new(1, 0))
+
+		local knob = Instance.new("Frame")
+		knob.Size = UDim2.fromOffset(12, 12)
+		knob.Position = UDim2.new(0, 2, 0.5, -6)
+		knob.BackgroundColor3 = PALETTE.Cream
+		knob.BorderSizePixel = 0
+		knob.Parent = track
+		corner(knob, UDim.new(1, 0))
+
+		local state = false
+		local info = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+		local function render()
+			tween(track, info, {BackgroundColor3 = state and PALETTE.Orange or PALETTE.TrackOff})
+			tween(knob, info, {Position = state and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
+			tween(rowStroke, info, {Color = state and PALETTE.Orange or PALETTE.Stroke, Transparency = state and 0.15 or 0.6})
+			tween(label, info, {TextColor3 = state and Color3.fromRGB(255, 255, 255) or PALETTE.Cream})
+		end
+
+		local hover = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		row.MouseEnter:Connect(function() tween(row, hover, {BackgroundTransparency = 0.05}) end)
+		row.MouseLeave:Connect(function() tween(row, hover, {BackgroundTransparency = 0.2}) end)
+
+		local function fire()
+			if not callback then return end
+			local ok, err = pcall(callback, state)
+			if not ok then warn("[" .. name .. "] error en '" .. tostring(text) .. "':", err) end
+		end
+
+		row.MouseButton1Click:Connect(function()
+			state = not state
+			render()
+			fire()
+		end)
+
+		return {
+			Set = function(_, v)
+				v = v and true or false
+				if v == state then return end
+				state = v
+				render()
+				fire()
+			end,
+			Get = function() return state end,
+		}
+	end
+
+	function WindowAPI:AddSection(text)
+		local holder = Instance.new("Frame")
+		holder.Size = UDim2.new(1, 0, 0, 22)
+		holder.BackgroundTransparency = 1
+		holder.LayoutOrder = self.LayoutOrder
+		holder.Parent = content
+		self.LayoutOrder = self.LayoutOrder + 1
+
+		local l = makeLabel(holder, text, 12, PALETTE.Orange)
+		l.Size = UDim2.new(1, 0, 0, 18)
+		l.Position = UDim2.fromOffset(2, 0)
+		l.TextStrokeTransparency = 0.6
+		l.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+
+		local line = Instance.new("Frame")
+		line.Size = UDim2.new(1, -4, 0, 1)
+		line.Position = UDim2.new(0, 2, 1, -2)
+		line.BackgroundColor3 = PALETTE.Stroke
+		line.BackgroundTransparency = 0.55
+		line.BorderSizePixel = 0
+		line.Parent = holder
+	end
+
+	function WindowAPI:AddList()
+		local frame = Instance.new("Frame")
+		frame.Size = UDim2.new(1, 0, 0, 0)
+		frame.AutomaticSize = Enum.AutomaticSize.Y
+		frame.BackgroundColor3 = PALETTE.PanelDark
+		frame.BackgroundTransparency = 0.35
+		frame.BorderSizePixel = 0
+		frame.LayoutOrder = self.LayoutOrder
+		frame.Parent = content
+		self.LayoutOrder = self.LayoutOrder + 1
+		corner(frame, UDim.new(0, 10))
+		stroke(frame, PALETTE.Stroke, 1, 0.65)
+
+		local p = Instance.new("UIPadding")
+		p.PaddingTop = UDim.new(0, 6)
+		p.PaddingBottom = UDim.new(0, 6)
+		p.PaddingLeft = UDim.new(0, 6)
+		p.PaddingRight = UDim.new(0, 6)
+		p.Parent = frame
+
+		local l = Instance.new("UIListLayout")
+		l.Padding = UDim.new(0, 5)
+		l.SortOrder = Enum.SortOrder.LayoutOrder
+		l.Parent = frame
+
+		local ListAPI = { Order = 1 }
+
+		function ListAPI:AddButton(text, callback)
+			local b = Instance.new("TextButton")
+			b.Size = UDim2.new(1, 0, 0, 28)
+			b.BackgroundColor3 = PALETTE.Panel
+			b.BackgroundTransparency = 0.1
+			b.Text = text
+			b.TextColor3 = PALETTE.Cream
+			b.TextSize = 13
+			b.FontFace = CUSTOM_FONT
+			b.AutoButtonColor = false
+			b.BorderSizePixel = 0
+			b.LayoutOrder = self.Order
+			b.Parent = frame
+			self.Order = self.Order + 1
+			corner(b, UDim.new(0, 8))
+			local bStroke = stroke(b, PALETTE.Stroke, 1, 0.65)
+
+			local accent = Instance.new("Frame")
+			accent.Size = UDim2.fromOffset(3, 12)
+			accent.Position = UDim2.new(0, 7, 0.5, -6)
+			accent.BackgroundColor3 = PALETTE.Orange
+			accent.BorderSizePixel = 0
+			accent.Parent = b
+			corner(accent, UDim.new(1, 0))
+
+			local fast = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			b.MouseEnter:Connect(function()
+				tween(b, fast, {BackgroundTransparency = 0})
+				tween(bStroke, fast, {Color = PALETTE.Orange, Transparency = 0.35})
+			end)
+			b.MouseLeave:Connect(function()
+				tween(b, fast, {BackgroundTransparency = 0.1, BackgroundColor3 = PALETTE.Panel})
+				tween(bStroke, fast, {Color = PALETTE.Stroke, Transparency = 0.65})
+			end)
+			b.MouseButton1Down:Connect(function() tween(b, fast, {BackgroundColor3 = PALETTE.PanelLight}) end)
+			b.MouseButton1Up:Connect(function() tween(b, fast, {BackgroundColor3 = PALETTE.Panel}) end)
+
+			b.MouseButton1Click:Connect(function()
+				if not callback then return end
+				local ok, err = pcall(callback)
+				if not ok then warn("[" .. name .. "] error en '" .. tostring(text) .. "':", err) end
+			end)
+			return b
+		end
+
+		return ListAPI
+	end
+
+	function WindowAPI:Destroy() close() end
+
+	return WindowAPI
+end
+
+return Library
