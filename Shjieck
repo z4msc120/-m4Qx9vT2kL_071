@@ -1,0 +1,548 @@
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+
+local Whitelist = {
+    ["eliashdz2920"] = true,
+    ["jerehzxs"] = true,
+    ["74yx_x"] = true,
+    ["b92b08a"] = true,
+    ["gordinhamaistabomscr"] = true,
+    ["baby_nati0"] = true,
+    ["blobloa7"] = true,
+    ["mahary460"] = true,
+    ["harts1234giles"] = true,
+    ["antoniozinn2"] = true,
+    ["hi1235010"] = true,
+    ["izanmartin13"] = true,
+    ["ikeaaaa_4"] = true,
+    ["ikeaaa_4"] = true,
+    ["antoniommvnz"] = true,
+    ["iigouhstlish"] = true,
+    ["rrhsngb"] = true,
+    ["ampiii_robloxiana8"] = true,
+    ["lalalakd124"] = true,
+    ["lilgee424"] = true,
+    ["juan1010150"] = true,
+    ["arinao051"] = true,
+    ["wedne19837"] = true,
+    ["jebfbfjjf"] = true,
+    ["cookiesandcream_2938"] = true,
+    ["wedne19837thbest"] = true,
+    ["lewis_tykv123p"] = true,
+    ["13kna10_1"] = true,
+    ["iluvamypond"] = true,
+    ["kingkaleb2473"] = true,
+    ["amnyx0_o"] = true,
+    ["parad9ise"] = true,
+    ["yogiboaj"] = true,
+    ["chiclao1"] = true,
+    ["rocky_56692"] = true,
+    ["eli300600"] = true,
+    ["spookymaplee"] = true,
+    ["purpleunicorn9316"] = true,
+    ["kashingthabank"] = true,
+    ["vv1ni_0"] = true,
+    ["elfino300021"] = true,
+    ["mm2plary2"] = true,
+    ["xvcwrse"] = true,
+    ["6580pei"] = true,
+    ["bebdm028"] = true,
+    ["notd9rkness"] = true,
+    ["curedsolace"] = true,
+    ["mobliegod4"] = true,
+    ["wildfire26o9"] = true,
+    ["laysneyley"] = true,
+    ["samsam21411"] = true,
+    ["lyla_ha"] = true,
+    ["la_vannille1234"] = true,
+    ["nvx4ee"] = true,
+    ["bruh123op8"] = true,
+    ["cavifx"] = true,
+    ["jaceton_5"] = true,
+    ["tenger_pp"] = true,
+    ["nikepro_kid"] = true,
+    ["tenger_ppb"] = true,
+    ["farakiou"] = true,
+    ["mmvsamu"] = true,
+    ["8_ia20"] = true,
+    ["1axstroz"] = true,
+    ["rs_bynnah"] = true,
+    ["brainrotmythicstorag"] = true,
+    ["nvmchr0n1s"] = true,
+    ["woozywozz"] = true,
+    ["rnz2304"] = true
+}
+
+local playerName = string.lower(Player.Name)
+if not Whitelist[playerName] then
+    local deniedGui = Instance.new("ScreenGui")
+    deniedGui.Name = "AccessDenied"
+    deniedGui.ResetOnSpawn = false
+    deniedGui.Parent = Player:WaitForChild("PlayerGui")
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 350, 0, 150)
+    frame.Position = UDim2.new(0.5, -175, 0.5, -75)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    frame.BorderSizePixel = 0
+    frame.Parent = deniedGui
+
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Color = Color3.fromRGB(255, 50, 50)
+    stroke.Thickness = 3
+
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1, -20, 1, -20)
+    text.Position = UDim2.new(0, 10, 0, 10)
+    text.BackgroundTransparency = 1
+    text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en 5 segundos..."
+    text.TextColor3 = Color3.fromRGB(255, 50, 50)
+    text.TextScaled = true
+    text.Font = Enum.Font.FredokaOne
+    text.TextWrapped = true
+    text.Parent = frame
+
+    task.spawn(function()
+        for i = 5, 1, -1 do
+            if not text.Parent then break end
+            text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en " .. i .. " segundos..."
+            task.wait(1)
+        end
+        if deniedGui.Parent then
+            deniedGui:Destroy()
+        end
+    end)
+
+    return
+end
+
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp"))()
+
+local ORIGINAL_IDS = {
+	MatrixScope = "115264692533866",
+	VoidScope = "125806303939871"
+}
+
+local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200)
+local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190)
+local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20)
+local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
+local TRAIL_VOID_CYAN = Color3.fromRGB(130, 235, 255)
+local TRAIL_VOID_WHITE = Color3.fromRGB(255, 255, 255)
+local TRAIL_VOID_RED = Color3.fromRGB(255, 0, 0)
+local TRAIL_VOID_YELLOW = Color3.fromRGB(255, 220, 40)
+local TRAIL_VOID_PINK = Color3.fromRGB(255, 105, 180)
+local TRAIL_VOID_BLUE = Color3.fromRGB(30, 80, 255)
+local TRAIL_PURPLE = Color3.fromRGB(110, 30, 180)
+local TRAIL_MATRIX_BLUE = Color3.fromRGB(30, 80, 220)
+local TRAIL_MATRIX_WHITE = Color3.fromRGB(255, 255, 255)
+local TRAIL_MATRIX_PINK = Color3.fromRGB(255, 80, 190)
+local TRAIL_MATRIX_CYAN = Color3.fromRGB(130, 235, 255)
+local TRAIL_MATRIX_RED = Color3.fromRGB(255, 40, 40)
+local TRAIL_ORANGE = Color3.fromRGB(255, 130, 20)
+local TRAIL_GREY = Color3.fromRGB(120, 120, 120)
+local TRAIL_LADYBUG_1 = Color3.fromRGB(120, 0, 0)
+local TRAIL_LADYBUG_2 = Color3.fromRGB(0, 0, 0)
+local TRAIL_CORALINE_1 = Color3.fromRGB(255, 220, 40)
+local TRAIL_CORALINE_2 = Color3.fromRGB(20, 40, 120)
+local TRAIL_JACK_1 = Color3.fromRGB(255, 255, 255)
+local TRAIL_JACK_2 = Color3.fromRGB(0, 0, 0)
+local TRAIL_BRIDE_1 = Color3.fromRGB(150, 220, 255)
+local TRAIL_BRIDE_2 = Color3.fromRGB(255, 255, 255)
+local TRAIL_COCO_1 = Color3.fromRGB(255, 140, 0)
+local TRAIL_COCO_2 = Color3.fromRGB(180, 20, 255)
+local TRAIL_ADDAMS_1 = Color3.fromRGB(180, 20, 255)
+local TRAIL_ADDAMS_2 = Color3.fromRGB(0, 0, 0)
+local TRAIL_CREATOR_1 = Color3.fromRGB(255, 0, 0)
+local TRAIL_CREATOR_2 = Color3.fromRGB(255, 255, 255)
+
+local OLD_TEXTURES = {
+	{Label = "Blue", ID = "85378243756133", Trail = "OldBlue"},
+	{Label = "Pink", ID = "96727605945800", Trail = "OldPink"},
+	{Label = "Red", ID = "107856956828072", Trail = "OldRed"},
+	{Label = "Yellow", ID = "94304459804134", Trail = "OldYellow"},
+	{Label = "Rainbow", ID = "96848125572179", Trail = "Rainbow"}
+}
+
+local TEXTURES = {
+	{Label = "Creator Scope", ID = "119439781607263", Trail = "Creator"},
+	{Label = "Purple", ID = "119984532697206", Trail = "Purple"},
+	{Label = "Blue", ID = "129960987268661", Trail = "MatrixBlue"},
+	{Label = "White", ID = "139770862667997", Trail = "MatrixWhite"},
+	{Label = "Rainbow", ID = "119267180743814", Trail = "Rainbow"},
+	{Label = "Pink", ID = "108885925742672", Trail = "MatrixPink"},
+	{Label = "Cyan", ID = "99317531375655", Trail = "MatrixCyan"},
+	{Label = "Red", ID = "87482398143669", Trail = "MatrixRed"},
+	{Label = "Halloween", ID = "115193257317497", Trail = "Orange"},
+	{Label = "Grey", ID = "94981229780807", Trail = "Grey"},
+	{Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
+	{Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
+	{Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
+	{Label = "Jack", ID = "109587843256297", Trail = "Jack"},
+	{Label = "Coco", ID = "104707398257454", Trail = "Coco"},
+	{Label = "Addams Family", ID = "121431974108410", Trail = "AddamsFamily"}
+}
+
+local VOID_TEXTURES = {
+	{Label = "Creator Scope", ID = "119439781607263", Trail = "Creator"},
+	{Label = "Cyan", ID = "122473949960500", Trail = "VoidCyan"},
+	{Label = "White", ID = "76708801992507", Trail = "VoidWhite"},
+	{Label = "Red", ID = "88456280777185", Trail = "VoidRed"},
+	{Label = "Yellow", ID = "115760494944625", Trail = "VoidYellow"},
+	{Label = "Pink", ID = "116484869596442", Trail = "VoidPink"},
+	{Label = "Blue", ID = "70445488766534", Trail = "VoidBlue"},
+	{Label = "Halloween", ID = "98602677050830", Trail = "VoidOrange"},
+	{Label = "Rainbow", ID = "102290178861090", Trail = "Rainbow"},
+	{Label = "Grey", ID = "115785353403149", Trail = "Grey"},
+	{Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
+	{Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
+	{Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
+	{Label = "Jack", ID = "109587843256297", Trail = "Jack"},
+	{Label = "Coco", ID = "104707398257454", Trail = "Coco"},
+	{Label = "Addams Family", ID = "121431974108410", Trail = "AddamsFamily"}
+}
+
+local TRAIL_PRESETS = {
+	OldBlue = {Color = TRAIL_OLD_BLUE},
+	OldPink = {Color = TRAIL_OLD_PINK},
+	OldRed = {Color = TRAIL_OLD_RED},
+	OldYellow = {Color = TRAIL_OLD_YELLOW},
+	Rainbow = {Rainbow = true},
+	VoidCyan = {Color = TRAIL_VOID_CYAN},
+	VoidWhite = {Color = TRAIL_VOID_WHITE},
+	VoidRed = {Color = TRAIL_VOID_RED},
+	VoidYellow = {Color = TRAIL_VOID_YELLOW},
+	VoidPink = {Color = TRAIL_VOID_PINK},
+	VoidBlue = {Color = TRAIL_VOID_BLUE},
+	VoidOrange = {Color = TRAIL_ORANGE},
+	Purple = {Color = TRAIL_PURPLE},
+	MatrixBlue = {Color = TRAIL_MATRIX_BLUE},
+	MatrixWhite = {Color = TRAIL_MATRIX_WHITE},
+	MatrixPink = {Color = TRAIL_MATRIX_PINK},
+	MatrixCyan = {Color = TRAIL_MATRIX_CYAN},
+	MatrixRed = {Color = TRAIL_MATRIX_RED},
+	Orange = {Color = TRAIL_ORANGE},
+	Grey = {Color = TRAIL_GREY},
+	Ladybug = {Color = TRAIL_LADYBUG_1, Color2 = TRAIL_LADYBUG_2},
+	Coraline = {Color = TRAIL_CORALINE_1, Color2 = TRAIL_CORALINE_2},
+	Jack = {Color = TRAIL_JACK_1, Color2 = TRAIL_JACK_2},
+	CorpseBride = {Color = TRAIL_BRIDE_1, Color2 = TRAIL_BRIDE_2},
+	Coco = {Color = TRAIL_COCO_1, Color2 = TRAIL_COCO_2},
+	AddamsFamily = {Color = TRAIL_ADDAMS_1, Color2 = TRAIL_ADDAMS_2},
+	Creator = {Color = TRAIL_CREATOR_1, Color2 = TRAIL_CREATOR_2}
+}
+
+local originalProperties = {}
+
+local function saveOriginal(object, property)
+	originalProperties[object] = originalProperties[object] or {}
+	local properties = originalProperties[object]
+	if properties[property] == nil then
+		local ok, value = pcall(function() return object[property] end)
+		if ok then properties[property] = value end
+	end
+end
+
+local function restoreObject(object)
+	local properties = originalProperties[object]
+	if not properties or not object.Parent then return end
+	for property, value in pairs(properties) do
+		pcall(function() object[property] = value end)
+	end
+end
+
+local states = {MatrixScope = false, VoidScope = false}
+local targets = {MatrixScope = {}, VoidScope = {}}
+
+local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailColorMatrix2, selectedTrailRainbowMatrix = TEXTURES[1].ID, TRAIL_PRESETS[TEXTURES[1].Trail].Color, TRAIL_PRESETS[TEXTURES[1].Trail].Color2, false
+local selectedTextureVoid, selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color2, false
+
+local function getId(v) return tostring(v or ""):match("%d+") end
+local function getTexture(obj)
+	if obj:IsA("Texture") or obj:IsA("Decal") then return getId(obj.Texture)
+	elseif obj:IsA("MeshPart") then return getId(obj.TextureID)
+	elseif obj:IsA("SpecialMesh") then return getId(obj.TextureId)
+	elseif obj:IsA("SurfaceAppearance") then return getId(obj.ColorMap) end
+end
+
+local function setTexture(obj, id)
+	local value = "rbxassetid://" .. id
+	if obj:IsA("Texture") or obj:IsA("Decal") then
+		saveOriginal(obj, "Texture")
+		obj.Texture = value
+	elseif obj:IsA("MeshPart") then
+		saveOriginal(obj, "TextureID")
+		obj.TextureID = value
+	elseif obj:IsA("SpecialMesh") then
+		saveOriginal(obj, "TextureId")
+		obj.TextureId = value
+	elseif obj:IsA("SurfaceAppearance") then
+		saveOriginal(obj, "ColorMap")
+		obj.ColorMap = value
+	end
+end
+
+local function findScope(obj)
+	local id = getTexture(obj)
+	for scope, originalId in pairs(ORIGINAL_IDS) do
+		if id == originalId then return scope end
+	end
+
+	local c = obj
+	local gunDisplay = nil
+	while c and c ~= game do
+		if c.Name == "GunDisplay" then gunDisplay = c break end
+		c = c.Parent
+	end
+	
+	if gunDisplay then
+		for _, descendant in ipairs(gunDisplay:GetDescendants()) do
+			local did = getTexture(descendant)
+			for scope, originalId in pairs(ORIGINAL_IDS) do
+				if did == originalId then return scope end
+			end
+		end
+	end
+end
+
+local function isValidWeapon(obj)
+	local c = obj
+	local belongsToPlayer = false
+	local isGun = false
+	local isGunDisplay = false
+	
+	while c and c ~= game do
+		if c == Player.Character or c == Player:FindFirstChild("Backpack") then
+			belongsToPlayer = true
+		end
+		if c.Name == "Gun" then
+			isGun = true
+		elseif c.Name == "GunDisplay" then
+			isGunDisplay = true
+		end
+		c = c.Parent
+	end
+	
+	if isGunDisplay then return true end
+	return belongsToPlayer and isGun
+end
+
+local function isInsideNonGunTool(obj)
+	local c = obj.Parent
+	while c and c ~= game do
+		if c:IsA("Tool") then
+			if c.Name ~= "Gun" then
+				return true
+			end
+		end
+		c = c.Parent
+	end
+	return false
+end
+
+local function register(obj)
+	if not isValidWeapon(obj) then return nil end
+	local scope = findScope(obj)
+	if not scope and obj:FindFirstAncestor("GunDisplay") then
+		scope = states.VoidScope and "VoidScope" or "MatrixScope"
+	end
+	if not scope then return nil end
+
+	for _, data in ipairs(targets[scope]) do
+		if data.Object == obj then return scope end
+	end
+	table.insert(targets[scope], {Object = obj, Original = ORIGINAL_IDS[scope]})
+	return scope
+end
+
+local function apply(scope)
+	local texId = (scope == "MatrixScope") and selectedTextureMatrix or selectedTextureVoid
+	for i = #targets[scope], 1, -1 do
+		local data = targets[scope][i]
+		if not data.Object or not data.Object.Parent then
+			table.remove(targets[scope], i)
+		elseif states[scope] then
+			setTexture(data.Object, texId)
+		else
+			restoreObject(data.Object)
+		end
+	end
+end
+
+local Window = UILibrary:CreateWindow({
+	Name = "MatrixAndVoidRecolor",
+	Title = "Matrix And Void Recolor",
+	Watermark = "made by samlpzx - sammxqpzw on TikTok\ninsp: kudo"
+})
+
+Window:AddToggle("MatrixScope", function(state)
+	states.MatrixScope = state
+	apply("MatrixScope")
+end)
+
+Window:AddToggle("VoidScope", function(state)
+	states.VoidScope = state
+	apply("VoidScope")
+end)
+
+Window:AddSection("MatrixScope Textures")
+local matrixList = Window:AddList()
+for _, info in ipairs(TEXTURES) do
+	matrixList:AddButton(info.Label, function()
+		local preset = TRAIL_PRESETS[info.Trail] or {}
+		selectedTextureMatrix = info.ID
+		selectedTrailRainbowMatrix = preset.Rainbow or false
+		selectedTrailColorMatrix = preset.Rainbow and nil or (preset.Color or TRAIL_PURPLE)
+		selectedTrailColorMatrix2 = preset.Color2
+		if states.MatrixScope then apply("MatrixScope") end
+	end)
+end
+
+Window:AddSection("VoidScope Textures")
+local voidList = Window:AddList()
+for _, info in ipairs(VOID_TEXTURES) do
+	voidList:AddButton(info.Label, function()
+		local preset = TRAIL_PRESETS[info.Trail] or {}
+		selectedTextureVoid = info.ID
+		selectedTrailRainbowVoid = preset.Rainbow or false
+		selectedTrailColorVoid = preset.Rainbow and nil or (preset.Color or TRAIL_VOID_CYAN)
+		selectedTrailColorVoid2 = preset.Color2
+		if states.VoidScope then apply("VoidScope") end
+	end)
+end
+
+Window:AddSection("Old Textures")
+local oldList = Window:AddList()
+for _, info in ipairs(OLD_TEXTURES) do
+	oldList:AddButton(info.Label, function()
+		local preset = TRAIL_PRESETS[info.Trail] or {}
+		selectedTextureMatrix = info.ID
+		selectedTextureVoid = info.ID
+		selectedTrailRainbowMatrix = preset.Rainbow or false
+		selectedTrailRainbowVoid = preset.Rainbow or false
+		selectedTrailColorMatrix = preset.Color or TRAIL_OLD_BLUE
+		selectedTrailColorVoid = preset.Color or TRAIL_VOID_CYAN
+		selectedTrailColorMatrix2 = preset.Color2
+		selectedTrailColorVoid2 = preset.Color2
+		if states.MatrixScope then apply("MatrixScope") end
+		if states.VoidScope then apply("VoidScope") end
+	end)
+end
+
+local function getActiveTrail()
+	if states.MatrixScope then
+		return selectedTrailColorMatrix, selectedTrailRainbowMatrix
+	elseif states.VoidScope then
+		return selectedTrailColorVoid, selectedTrailRainbowVoid
+	end
+	return nil, false
+end
+
+local RGB_SEQUENCE = ColorSequence.new({
+	ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+	ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+	ColorSequenceKeypoint.new(0.66, Color3.fromRGB(0, 0, 255)),
+	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
+})
+
+local LASER_KEYWORDS = {"beam", "laser", "trail", "tracer", "shot", "line", "ray", "disparo", "bala"}
+local function looksLikeShotBeam(beam)
+	if not beam:IsA("Beam") then return false end
+	local name = string.lower(beam.Name)
+	for _, kw in ipairs(LASER_KEYWORDS) do
+		if string.find(name, kw) then
+			return true
+		end
+	end
+	return false
+end
+
+local function changeBeamColor(beam)
+	if not beam or not beam.Parent then return end
+	if not looksLikeShotBeam(beam) then return end
+	if not (states.MatrixScope or states.VoidScope) then return end
+	if isInsideNonGunTool(beam) then return end
+
+	local activeColor, activeRainbow = getActiveTrail()
+	if not activeColor and not activeRainbow then return end
+
+	saveOriginal(beam, "Color")
+
+	if activeRainbow then
+		beam.Color = RGB_SEQUENCE
+	else
+		beam.Color = ColorSequence.new(activeColor)
+	end
+end
+
+local function monitorCharacter(char)
+	if not char then return end
+	for _, obj in ipairs(char:GetDescendants()) do
+		register(obj)
+	end
+	char.DescendantAdded:Connect(function(obj)
+		task.defer(function()
+			local scope = register(obj)
+			if scope then apply(scope) end
+		end)
+	end)
+end
+
+task.spawn(function()
+	if Player.Character then
+		monitorCharacter(Player.Character)
+	end
+	Player.CharacterAdded:Connect(monitorCharacter)
+
+	local bp = Player:WaitForChild("Backpack", 5)
+	if bp then
+		for _, obj in ipairs(bp:GetDescendants()) do
+			register(obj)
+		end
+		bp.DescendantAdded:Connect(function(obj)
+			task.defer(function()
+				local scope = register(obj)
+				if scope then apply(scope) end
+			end)
+		end)
+	end
+end)
+
+local TEXTURE_CLASSES = {
+	MeshPart = true, Texture = true, Decal = true,
+	SpecialMesh = true, SurfaceAppearance = true
+}
+local function isTextureObj(obj)
+	return TEXTURE_CLASSES[obj.ClassName] == true
+end
+
+Workspace.DescendantAdded:Connect(function(obj)
+	if obj:IsA("Beam") then
+		task.defer(function()
+			changeBeamColor(obj)
+		end)
+	elseif isTextureObj(obj) then
+		task.defer(function()
+			local scope = register(obj)
+			if scope then apply(scope) end
+		end)
+	end
+end)
+
+task.defer(function()
+	for _, obj in ipairs(Workspace:GetDescendants()) do
+		if obj:IsA("Beam") then
+			task.defer(function()
+				changeBeamColor(obj)
+			end)
+		elseif isTextureObj(obj) then
+			local scope = register(obj)
+			if scope then apply(scope) end
+		end
+	end
+end)
