@@ -536,7 +536,7 @@ end)
 
 task.defer(function()
 	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if obj:IsA("Beam") then
+		if obj:IsA("CustomBeam") then
 			task.defer(function()
 				changeBeamColor(obj)
 			end)
