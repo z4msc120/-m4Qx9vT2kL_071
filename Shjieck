@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
+local Camera = game:GetService("Workspace").CurrentCamera
 
 local Player = Players.LocalPlayer
 
@@ -123,11 +124,6 @@ end
 
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp"))()
 
-local ORIGINAL_IDS = {
-	MatrixScope = "115264692533866",
-	VoidScope = "125806303939871"
-}
-
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200)
 local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190)
 local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20)
@@ -237,6 +233,16 @@ local TRAIL_PRESETS = {
 	Creator = {Color = TRAIL_CREATOR_1, Color2 = TRAIL_CREATOR_2}
 }
 
+local SHOT_NAMES = {
+	Bullet = true, Projectile = true, Tracer = true, Shot = true, Laser = true,
+	BulletTrail = true, BulletTracer = true, MuzzleFlash = true,
+	CustomBeam = true, Beam = true, Trail = true, Ray = true,
+	LaserBeam = true, GunBeam = true, Spark = true, Effect = true,
+	GunTrail = true, ShootBeam = true, FireBeam = true, TracerBeam = true,
+	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true, 
+	GunShoulderAttachment = true, GunBelt = true
+}
+
 local originalProperties = {}
 
 local function saveOriginal(object, property)
@@ -262,105 +268,118 @@ local targets = {MatrixScope = {}, VoidScope = {}}
 local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailColorMatrix2, selectedTrailRainbowMatrix = TEXTURES[1].ID, TRAIL_PRESETS[TEXTURES[1].Trail].Color, TRAIL_PRESETS[TEXTURES[1].Trail].Color2, false
 local selectedTextureVoid, selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color2, false
 
-local function getId(v) return tostring(v or ""):match("%d+") end
-local function getTexture(obj)
-	if obj:IsA("Texture") or obj:IsA("Decal") then return getId(obj.Texture)
-	elseif obj:IsA("MeshPart") then return getId(obj.TextureID)
-	elseif obj:IsA("SpecialMesh") then return getId(obj.TextureId)
-	elseif obj:IsA("SurfaceAppearance") then return getId(obj.ColorMap) end
+local nearestDisplayCache = nil
+
+local function processIfTexture(obj)
+	if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
+		task.defer(function()
+			local scope = register(obj)
+			if scope and (states.MatrixScope or states.VoidScope) then apply(scope) end
+		end)
+	end
+end
+
+local function updateNearestDisplay()
+    local character = Player.Character
+    local root = character and character:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    
+    local nearest, nearestDistance = nil, 10
+    for _, object in ipairs(Workspace:GetDescendants()) do
+        if object.Name == "GunDisplay" or object.Name == "DisplayRefGun" then
+            local part
+            if object:IsA("BasePart") then part = object
+            elseif object:IsA("Model") then part = object.PrimaryPart or object:FindFirstChildWhichIsA("BasePart", true)
+            elseif object:IsA("Tool") then part = object:FindFirstChild("Handle", true) end
+            
+            if part and part:IsA("BasePart") then
+                local distance = (part.Position - root.Position).Magnitude
+                if distance < nearestDistance then 
+                    nearestDistance = distance
+                    nearest = object 
+                end
+            end
+        end
+    end
+    
+    if nearest ~= nearestDisplayCache then
+        nearestDisplayCache = nearest
+        if nearestDisplayCache then
+            for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
+                processIfTexture(obj)
+            end
+        end
+    end
+end
+
+task.spawn(function()
+    while task.wait(0.5) do
+        updateNearestDisplay()
+    end
+end)
+
+local function isMyWeapon(obj)
+    local current = obj
+    local validContainer = nil
+
+    while current and current ~= game do
+        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" then
+            validContainer = current
+            break
+        end
+        current = current.Parent
+    end
+
+    if not validContainer then return false end
+
+    if validContainer.Name == "Gun" then
+        if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
+        if Player:FindFirstChild("Backpack") and validContainer:IsDescendantOf(Player:FindFirstChild("Backpack")) then return true end
+        if Camera and validContainer:IsDescendantOf(Camera) then return true end
+        return false
+    end
+
+    if validContainer.Name == "GunDisplay" or validContainer.Name == "DisplayRefGun" then
+        if Camera and validContainer:IsDescendantOf(Camera) then return true end
+        if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
+        if nearestDisplayCache and (validContainer == nearestDisplayCache or validContainer:IsDescendantOf(nearestDisplayCache)) then return true end
+        return false
+    end
+
+    return false
 end
 
 local function setTexture(obj, id)
 	local value = "rbxassetid://" .. id
-	if obj:IsA("Texture") or obj:IsA("Decal") then
-		saveOriginal(obj, "Texture")
-		obj.Texture = value
-	elseif obj:IsA("MeshPart") then
+	if obj:IsA("MeshPart") then
 		saveOriginal(obj, "TextureID")
 		obj.TextureID = value
 	elseif obj:IsA("SpecialMesh") then
 		saveOriginal(obj, "TextureId")
 		obj.TextureId = value
-	elseif obj:IsA("SurfaceAppearance") then
-		saveOriginal(obj, "ColorMap")
-		obj.ColorMap = value
 	end
 end
 
-local function findScope(obj)
-	local id = getTexture(obj)
-	for scope, originalId in pairs(ORIGINAL_IDS) do
-		if id == originalId then return scope end
-	end
+function register(obj)
+	if not isMyWeapon(obj) then return nil end
 
-	local c = obj
-	local gunDisplay = nil
-	while c and c ~= game do
-		if c.Name == "GunDisplay" then gunDisplay = c break end
-		c = c.Parent
+	if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
+		pcall(function() obj:Destroy() end)
+		return nil
 	end
 	
-	if gunDisplay then
-		for _, descendant in ipairs(gunDisplay:GetDescendants()) do
-			local did = getTexture(descendant)
-			for scope, originalId in pairs(ORIGINAL_IDS) do
-				if did == originalId then return scope end
-			end
-		end
-	end
-end
+	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return nil end
 
-local function isValidWeapon(obj)
-	local c = obj
-	local belongsToPlayer = false
-	local isGun = false
-	local isGunDisplay = false
-	
-	while c and c ~= game do
-		if c == Player.Character or c == Player:FindFirstChild("Backpack") then
-			belongsToPlayer = true
-		end
-		if c.Name == "Gun" then
-			isGun = true
-		elseif c.Name == "GunDisplay" then
-			isGunDisplay = true
-		end
-		c = c.Parent
-	end
-	
-	if isGunDisplay then return true end
-	return belongsToPlayer and isGun
-end
-
-local function isInsideNonGunTool(obj)
-	local c = obj.Parent
-	while c and c ~= game do
-		if c:IsA("Tool") then
-			if c.Name ~= "Gun" then
-				return true
-			end
-		end
-		c = c.Parent
-	end
-	return false
-end
-
-local function register(obj)
-	if not isValidWeapon(obj) then return nil end
-	local scope = findScope(obj)
-	if not scope and obj:FindFirstAncestor("GunDisplay") then
-		scope = states.VoidScope and "VoidScope" or "MatrixScope"
-	end
-	if not scope then return nil end
+	local scope = states.VoidScope and "VoidScope" or "MatrixScope"
 
 	for _, data in ipairs(targets[scope]) do
 		if data.Object == obj then return scope end
 	end
-	table.insert(targets[scope], {Object = obj, Original = ORIGINAL_IDS[scope]})
+	table.insert(targets[scope], {Object = obj})
 	return scope
 end
 
-local function apply(scope)
+function apply(scope)
 	local texId = (scope == "MatrixScope") and selectedTextureMatrix or selectedTextureVoid
 	for i = #targets[scope], 1, -1 do
 		local data = targets[scope][i]
@@ -450,99 +469,129 @@ local RGB_SEQUENCE = ColorSequence.new({
 	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
 })
 
-local LASER_KEYWORDS = {"Beam", "CustomBeam", "trail", "tracer", "shot", "line", "ray", "disparo", "bala"}
-local function looksLikeShotBeam(beam)
-	if not beam:IsA("Beam") then return false end
-	local name = string.lower(beam.Name)
-	for _, kw in ipairs(LASER_KEYWORDS) do
-		if string.find(name, kw) then
-			return true
-		end
-	end
-	return false
+local function colorBeamOrPart(obj, activeColor, activeRainbow)
+    if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
+        saveOriginal(obj, "Color")
+        if activeRainbow then
+            obj.Color = RGB_SEQUENCE
+        else
+            obj.Color = ColorSequence.new(activeColor)
+        end
+    elseif obj:IsA("BasePart") then
+        saveOriginal(obj, "Color")
+        if activeRainbow then
+            obj.Color = Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255))
+        else
+            obj.Color = activeColor
+        end
+    end
 end
 
-local function changeBeamColor(beam)
-	if not beam or not beam.Parent then return end
-	if not looksLikeShotBeam(beam) then return end
-	if not (states.MatrixScope or states.VoidScope) then return end
-	if isInsideNonGunTool(beam) then return end
-
+RunService.RenderStepped:Connect(function()
+	if not states.MatrixScope and not states.VoidScope then return end
 	local activeColor, activeRainbow = getActiveTrail()
 	if not activeColor and not activeRainbow then return end
 
-	saveOriginal(beam, "Color")
-
-	if activeRainbow then
-		beam.Color = RGB_SEQUENCE
-	else
-		beam.Color = ColorSequence.new(activeColor)
+	if Player.Character then
+		for _, obj in ipairs(Player.Character:GetDescendants()) do
+			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
+				if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
+			end
+		end
 	end
+
+	if Camera then
+		for _, obj in ipairs(Camera:GetDescendants()) do
+			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
+				if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
+			end
+		end
+	end
+	
+	if nearestDisplayCache then
+		for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
+			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
+				colorBeamOrPart(obj, activeColor, activeRainbow)
+			end
+		end
+	end
+end)
+
+local function findShotContainer(object)
+    if SHOT_NAMES[object.Name] then return object end
+    if object.Parent and SHOT_NAMES[object.Parent.Name] then return object.Parent end
+    return nil
 end
 
-local function monitorCharacter(char)
-	if not char then return end
-	for _, obj in ipairs(char:GetDescendants()) do
-		register(obj)
-	end
-	char.DescendantAdded:Connect(function(obj)
-		task.defer(function()
-			local scope = register(obj)
-			if scope then apply(scope) end
-		end)
+Workspace.DescendantAdded:Connect(function(object)
+	processIfTexture(object)
+	
+	if not states.MatrixScope and not states.VoidScope then return end
+	task.defer(function()
+		if not object.Parent then return end
+		
+		local shot = findShotContainer(object)
+		if shot then
+			local ownerId = shot:GetAttribute("OwnerUserId")
+			local isOurs = false
+			
+			if ownerId == Player.UserId then
+				isOurs = true
+			elseif ownerId == nil then
+				local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+				if root then
+					local pos = nil
+					if object:IsA("BasePart") then pos = object.Position
+					elseif object:IsA("Attachment") then pos = object.WorldPosition
+					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition 
+					elseif object:IsA("Trail") and object.Attachment0 then pos = object.Attachment0.WorldPosition end
+					
+					if pos and (pos - root.Position).Magnitude < 15 then
+						isOurs = true
+					end
+				end
+			end
+			
+			if isOurs then
+				local activeColor, activeRainbow = getActiveTrail()
+				colorBeamOrPart(shot, activeColor, activeRainbow)
+				for _, desc in ipairs(shot:GetDescendants()) do
+					colorBeamOrPart(desc, activeColor, activeRainbow)
+				end
+			end
+		end
 	end)
-end
+end)
+
+Camera.DescendantAdded:Connect(function(obj)
+	processIfTexture(obj)
+end)
 
 task.spawn(function()
-	if Player.Character then
-		monitorCharacter(Player.Character)
+    updateNearestDisplay()
+    
+	for _, obj in ipairs(Workspace:GetDescendants()) do
+		processIfTexture(obj)
 	end
-	Player.CharacterAdded:Connect(monitorCharacter)
-
-	local bp = Player:WaitForChild("Backpack", 5)
+	for _, obj in ipairs(Camera:GetDescendants()) do
+		processIfTexture(obj)
+	end
+	if Player.Character then
+		for _, obj in ipairs(Player.Character:GetDescendants()) do
+			processIfTexture(obj)
+		end
+	end
+	local bp = Player:FindFirstChild("Backpack")
 	if bp then
 		for _, obj in ipairs(bp:GetDescendants()) do
-			register(obj)
+			processIfTexture(obj)
 		end
-		bp.DescendantAdded:Connect(function(obj)
-			task.defer(function()
-				local scope = register(obj)
-				if scope then apply(scope) end
-			end)
-		end)
 	end
 end)
 
-local TEXTURE_CLASSES = {
-	MeshPart = true, Texture = true, Decal = true,
-	SpecialMesh = true, SurfaceAppearance = true
-}
-local function isTextureObj(obj)
-	return TEXTURE_CLASSES[obj.ClassName] == true
-end
-
-Workspace.DescendantAdded:Connect(function(obj)
-	if obj:IsA("Beam") then
-		task.defer(function()
-			changeBeamColor(obj)
-		end)
-	elseif isTextureObj(obj) then
-		task.defer(function()
-			local scope = register(obj)
-			if scope then apply(scope) end
-		end)
-	end
-end)
-
-task.defer(function()
-	for _, obj in ipairs(Workspace:GetDescendants()) do
-		if obj:IsA("CustomBeam") then
-			task.defer(function()
-				changeBeamColor(obj)
-			end)
-		elseif isTextureObj(obj) then
-			local scope = register(obj)
-			if scope then apply(scope) end
-		end
+Player.CharacterAdded:Connect(function(char)
+	task.wait(0.5)
+	for _, obj in ipairs(char:GetDescendants()) do
+		processIfTexture(obj)
 	end
 end)
