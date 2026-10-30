@@ -450,7 +450,7 @@ local RGB_SEQUENCE = ColorSequence.new({
 	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
 })
 
-local LASER_KEYWORDS = {"beam", "laser", "trail", "tracer", "shot", "line", "ray", "disparo", "bala"}
+local LASER_KEYWORDS = {"Beam", "CustomBeam", "trail", "tracer", "shot", "line", "ray", "disparo", "bala"}
 local function looksLikeShotBeam(beam)
 	if not beam:IsA("Beam") then return false end
 	local name = string.lower(beam.Name)
