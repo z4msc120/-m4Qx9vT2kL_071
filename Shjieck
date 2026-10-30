@@ -18,8 +18,8 @@ local Whitelist = {
     ["antoniozinn2"] = true,
     ["hi1235010"] = true,
     ["izanmartin13"] = true,
+    ["ikeaaaa_4"] = true,
     ["tozety45"] = true,
-    ["ikeaaa_4"] = true,
     ["antoniommvnz"] = true,
     ["iigouhstlish"] = true,
     ["rrhsngb"] = true,
@@ -101,7 +101,7 @@ if not Whitelist[playerName] then
     text.Size = UDim2.new(1, -20, 1, -20)
     text.Position = UDim2.new(0, 10, 0, 10)
     text.BackgroundTransparency = 1
-    text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en 5 segundos..."
+    text.Text = "NO TIENES ACCESO\nCompra el script para acceder a el.\n\nEste anuncio se cerrara en 5 segundos..."
     text.TextColor3 = Color3.fromRGB(255, 50, 50)
     text.TextScaled = true
     text.Font = Enum.Font.FredokaOne
@@ -111,7 +111,7 @@ if not Whitelist[playerName] then
     task.spawn(function()
         for i = 5, 1, -1 do
             if not text.Parent then break end
-            text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en " .. i .. " segundos..."
+            text.Text = "NO TIENES ACCESO\nCompra el script para acceder a el.\n\nEste anuncio se cerrara en " .. i .. " segundos..."
             task.wait(1)
         end
         if deniedGui.Parent then
@@ -239,7 +239,7 @@ local SHOT_NAMES = {
 	CustomBeam = true, Beam = true, Trail = true, Ray = true,
 	LaserBeam = true, GunBeam = true, Spark = true, Effect = true,
 	GunTrail = true, ShootBeam = true, FireBeam = true, TracerBeam = true,
-	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true, 
+	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true,
 	GunShoulderAttachment = true, GunBelt = true
 }
 
@@ -269,6 +269,8 @@ local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailColorMatrix2
 local selectedTextureVoid, selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color2, false
 
 local nearestDisplayCache = nil
+local register
+local apply
 
 local function processIfTexture(obj)
 	if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
@@ -283,7 +285,7 @@ local function updateNearestDisplay()
     local character = Player.Character
     local root = character and character:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
-    
+
     local nearest, nearestDistance = nil, 10
     for _, object in ipairs(Workspace:GetDescendants()) do
         if object.Name == "GunDisplay" or object.Name == "DisplayRefGun" then
@@ -291,17 +293,17 @@ local function updateNearestDisplay()
             if object:IsA("BasePart") then part = object
             elseif object:IsA("Model") then part = object.PrimaryPart or object:FindFirstChildWhichIsA("BasePart", true)
             elseif object:IsA("Tool") then part = object:FindFirstChild("Handle", true) end
-            
+
             if part and part:IsA("BasePart") then
                 local distance = (part.Position - root.Position).Magnitude
-                if distance < nearestDistance then 
+                if distance < nearestDistance then
                     nearestDistance = distance
-                    nearest = object 
+                    nearest = object
                 end
             end
         end
     end
-    
+
     if nearest ~= nearestDisplayCache then
         nearestDisplayCache = nearest
         if nearestDisplayCache then
@@ -342,6 +344,7 @@ local function isMyWeapon(obj)
     if validContainer.Name == "GunDisplay" or validContainer.Name == "DisplayRefGun" then
         if Camera and validContainer:IsDescendantOf(Camera) then return true end
         if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
+        if validContainer:FindFirstAncestor(Player.Name) then return true end
         if nearestDisplayCache and (validContainer == nearestDisplayCache or validContainer:IsDescendantOf(nearestDisplayCache)) then return true end
         return false
     end
@@ -367,7 +370,7 @@ function register(obj)
 		pcall(function() obj:Destroy() end)
 		return nil
 	end
-	
+
 	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return nil end
 
 	local scope = states.VoidScope and "VoidScope" or "MatrixScope"
@@ -507,7 +510,7 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end
-	
+
 	if nearestDisplayCache then
 		for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
 			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
@@ -515,6 +518,15 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end
+
+    local myFolder = Workspace:FindFirstChild(Player.Name)
+    if myFolder then
+        for _, obj in ipairs(myFolder:GetDescendants()) do
+            if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
+                if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
+            end
+        end
+    end
 end)
 
 local function findShotContainer(object)
@@ -525,16 +537,16 @@ end
 
 Workspace.DescendantAdded:Connect(function(object)
 	processIfTexture(object)
-	
+
 	if not states.MatrixScope and not states.VoidScope then return end
 	task.defer(function()
 		if not object.Parent then return end
-		
+
 		local shot = findShotContainer(object)
 		if shot then
 			local ownerId = shot:GetAttribute("OwnerUserId")
 			local isOurs = false
-			
+
 			if ownerId == Player.UserId then
 				isOurs = true
 			elseif ownerId == nil then
@@ -543,15 +555,15 @@ Workspace.DescendantAdded:Connect(function(object)
 					local pos = nil
 					if object:IsA("BasePart") then pos = object.Position
 					elseif object:IsA("Attachment") then pos = object.WorldPosition
-					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition 
+					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition
 					elseif object:IsA("Trail") and object.Attachment0 then pos = object.Attachment0.WorldPosition end
-					
+
 					if pos and (pos - root.Position).Magnitude < 15 then
 						isOurs = true
 					end
 				end
 			end
-			
+
 			if isOurs then
 				local activeColor, activeRainbow = getActiveTrail()
 				colorBeamOrPart(shot, activeColor, activeRainbow)
@@ -567,31 +579,46 @@ Camera.DescendantAdded:Connect(function(obj)
 	processIfTexture(obj)
 end)
 
+local function setupContainer(container)
+    if not container then return end
+    for _, obj in ipairs(container:GetDescendants()) do
+        processIfTexture(obj)
+    end
+    container.DescendantAdded:Connect(function(obj)
+        processIfTexture(obj)
+    end)
+end
+
 task.spawn(function()
     updateNearestDisplay()
-    
-	for _, obj in ipairs(Workspace:GetDescendants()) do
-		processIfTexture(obj)
-	end
-	for _, obj in ipairs(Camera:GetDescendants()) do
-		processIfTexture(obj)
-	end
-	if Player.Character then
-		for _, obj in ipairs(Player.Character:GetDescendants()) do
-			processIfTexture(obj)
-		end
-	end
-	local bp = Player:FindFirstChild("Backpack")
-	if bp then
-		for _, obj in ipairs(bp:GetDescendants()) do
-			processIfTexture(obj)
-		end
-	end
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        processIfTexture(obj)
+    end
+    for _, obj in ipairs(Camera:GetDescendants()) do
+        processIfTexture(obj)
+    end
+    if Player.Character then
+        setupContainer(Player.Character)
+    end
+    local bp = Player:FindFirstChild("Backpack")
+    if bp then
+        setupContainer(bp)
+    end
 end)
 
 Player.CharacterAdded:Connect(function(char)
-	task.wait(0.5)
-	for _, obj in ipairs(char:GetDescendants()) do
-		processIfTexture(obj)
-	end
+    setupContainer(char)
+    task.spawn(function()
+        task.wait(0.5)
+        updateNearestDisplay()
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            processIfTexture(obj)
+        end
+        local bp = Player:WaitForChild("Backpack", 5)
+        if bp then
+            setupContainer(bp)
+        end
+        if states.MatrixScope then apply("MatrixScope") end
+        if states.VoidScope then apply("VoidScope") end
+    end)
 end)
