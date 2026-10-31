@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
-local Camera = game:GetService("Workspace").CurrentCamera
 
 local Player = Players.LocalPlayer
 
@@ -328,13 +327,13 @@ local function updateNearestDisplay()
     end
 end
 
-local function isMyWeapon(obj)
+local function isMyGunPart(obj)
     local current = obj
     local validContainer = nil
     local validName = nil
 
     while current and current ~= game do
-        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" or SHOT_NAMES[current.Name] then
+        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" then
             validContainer = current
             validName = current.Name
             break
@@ -344,21 +343,33 @@ local function isMyWeapon(obj)
 
     if not validContainer then return false end
 
-    if validName == "Gun" or SHOT_NAMES[validName] then
+    if validName == "Gun" then
         if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
         if Player:FindFirstChild("Backpack") and validContainer:IsDescendantOf(Player:FindFirstChild("Backpack")) then return true end
-        if Camera and validContainer:IsDescendantOf(Camera) then return true end
         return false
     end
 
     if validName == "GunDisplay" or validName == "DisplayRefGun" then
-        if Camera and validContainer:IsDescendantOf(Camera) then return true end
         if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
-        if validContainer:FindFirstAncestor(Player.Name) then return true end
+        
+        local check = validContainer
+        while check and check ~= game do
+            if string.lower(check.Name) == string.lower(Player.Name) then return true end
+            check = check.Parent
+        end
+        
         if nearestDisplayCache and (validContainer == nearestDisplayCache or validContainer:IsDescendantOf(nearestDisplayCache)) then return true end
         return false
     end
 
+    return false
+end
+
+local function isMyBeam(obj)
+    if Player.Character and obj:IsDescendantOf(Player.Character) then return true end
+    local bp = Player:FindFirstChild("Backpack")
+    if bp and obj:IsDescendantOf(bp) then return true end
+    if isMyGunPart(obj) then return true end
     return false
 end
 
@@ -374,7 +385,7 @@ function setTexture(obj, id)
 end
 
 function register(obj)
-	if not isMyWeapon(obj) then return false end
+	if not isMyGunPart(obj) then return false end
 
 	if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
 		pcall(function() obj:Destroy() end)
@@ -475,26 +486,53 @@ local RGB_SEQUENCE = ColorSequence.new({
 	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
 })
 
+local function sequencesMatch(seq1, seq2)
+    local ok, result = pcall(function()
+        if type(seq1) ~= typeof(seq2) then return false end
+        if not seq1 or not seq2 then return false end
+        local k1, k2 = seq1.Keypoints, seq2.Keypoints
+        if #k1 ~= #k2 then return false end
+        for i = 1, #k1 do
+            if k1[i].Value ~= k2[i].Value or k1[i].Time ~= k2[i].Time then return false end
+        end
+        return true
+    end)
+    return ok and result
+end
+
 local function colorBeamOrPart(obj, color1, color2, rainbow)
     pcall(function()
         if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
-            saveOriginal(obj, "Color")
+            local targetColor
             if rainbow then
-                obj.Color = RGB_SEQUENCE
+                targetColor = RGB_SEQUENCE
             elseif color1 and color2 then
-                obj.Color = ColorSequence.new({
+                targetColor = ColorSequence.new({
                     ColorSequenceKeypoint.new(0.0, color1),
                     ColorSequenceKeypoint.new(1.0, color2)
                 })
             elseif color1 then
-                obj.Color = ColorSequence.new(color1)
+                targetColor = ColorSequence.new(color1)
+            end
+            
+            if targetColor then
+                if not sequencesMatch(obj.Color, targetColor) then
+                    saveOriginal(obj, "Color")
+                    obj.Color = targetColor
+                end
             end
         elseif obj:IsA("BasePart") then
-            saveOriginal(obj, "Color")
             if rainbow then
-                obj.Color = Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255))
+                local newC = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                if obj.Color ~= newC then
+                    saveOriginal(obj, "Color")
+                    obj.Color = newC
+                end
             elseif color1 then
-                obj.Color = color1
+                if obj.Color ~= color1 then
+                    saveOriginal(obj, "Color")
+                    obj.Color = color1
+                end
             end
         end
     end)
@@ -508,7 +546,7 @@ RunService.RenderStepped:Connect(function()
         for _, obj in ipairs(container:GetDescendants()) do
             if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
                 if activeMode ~= "None" then
-                    if isMyWeapon(obj) then colorBeamOrPart(obj, color1, color2, rainbow) end
+                    if isMyBeam(obj) then colorBeamOrPart(obj, color1, color2, rainbow) end
                 else
                     restoreObject(obj)
                 end
@@ -517,7 +555,6 @@ RunService.RenderStepped:Connect(function()
     end
 
     scanAndColor(Player.Character)
-    scanAndColor(Camera)
     scanAndColor(nearestDisplayCache)
     scanAndColor(Workspace:FindFirstChild(Player.Name))
 end)
@@ -568,6 +605,16 @@ Workspace.DescendantAdded:Connect(function(object)
 	end)
 end)
 
+local function setupContainer(container)
+    if not container then return end
+    for _, obj in ipairs(container:GetDescendants()) do
+        processIfTexture(obj)
+    end
+    container.DescendantAdded:Connect(function(obj)
+        processIfTexture(obj)
+    end)
+end
+
 task.spawn(function()
     while task.wait(1) do
         updateNearestDisplay()
@@ -598,5 +645,25 @@ task.spawn(function()
                 processIfTexture(obj)
             end
         end
+        
+        if activeMode ~= "None" then
+            apply()
+        end
     end
+end)
+
+Player.CharacterAdded:Connect(function(char)
+    setupContainer(char)
+    task.spawn(function()
+        task.wait(0.5)
+        updateNearestDisplay()
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            processIfTexture(obj)
+        end
+        local bp = Player:WaitForChild("Backpack", 5)
+        if bp then
+            setupContainer(bp)
+        end
+        if activeMode ~= "None" then apply() end
+    end)
 end)
