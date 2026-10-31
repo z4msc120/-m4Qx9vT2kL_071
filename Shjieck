@@ -19,7 +19,7 @@ local Whitelist = {
     ["hi1235010"] = true,
     ["izanmartin13"] = true,
     ["ikeaaaa_4"] = true,
-    ["tozety45"] = true,
+    ["ikeaaa_4"] = true,
     ["antoniommvnz"] = true,
     ["iigouhstlish"] = true,
     ["rrhsngb"] = true,
@@ -101,7 +101,7 @@ if not Whitelist[playerName] then
     text.Size = UDim2.new(1, -20, 1, -20)
     text.Position = UDim2.new(0, 10, 0, 10)
     text.BackgroundTransparency = 1
-    text.Text = "NO TIENES ACCESO\nCompra el script para acceder a el.\n\nEste anuncio se cerrara en 5 segundos..."
+    text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en 5 segundos..."
     text.TextColor3 = Color3.fromRGB(255, 50, 50)
     text.TextScaled = true
     text.Font = Enum.Font.FredokaOne
@@ -111,7 +111,7 @@ if not Whitelist[playerName] then
     task.spawn(function()
         for i = 5, 1, -1 do
             if not text.Parent then break end
-            text.Text = "NO TIENES ACCESO\nCompra el script para acceder a el.\n\nEste anuncio se cerrara en " .. i .. " segundos..."
+            text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en " .. i .. " segundos..."
             task.wait(1)
         end
         if deniedGui.Parent then
@@ -239,7 +239,7 @@ local SHOT_NAMES = {
 	CustomBeam = true, Beam = true, Trail = true, Ray = true,
 	LaserBeam = true, GunBeam = true, Spark = true, Effect = true,
 	GunTrail = true, ShootBeam = true, FireBeam = true, TracerBeam = true,
-	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true,
+	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true, 
 	GunShoulderAttachment = true, GunBelt = true
 }
 
@@ -263,20 +263,39 @@ local function restoreObject(object)
 end
 
 local states = {MatrixScope = false, VoidScope = false}
-local targets = {MatrixScope = {}, VoidScope = {}}
+local activeMode = "None"
+local targets = {}
 
 local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailColorMatrix2, selectedTrailRainbowMatrix = TEXTURES[1].ID, TRAIL_PRESETS[TEXTURES[1].Trail].Color, TRAIL_PRESETS[TEXTURES[1].Trail].Color2, false
 local selectedTextureVoid, selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color2, false
 
 local nearestDisplayCache = nil
 local register
-local apply
+
+local function apply()
+    local texId = nil
+    if activeMode == "MatrixScope" then
+        texId = selectedTextureMatrix
+    elseif activeMode == "VoidScope" then
+        texId = selectedTextureVoid
+    end
+
+    for i = #targets, 1, -1 do
+        local data = targets[i]
+        if not data.Object or not data.Object.Parent then
+            table.remove(targets, i)
+        elseif texId then
+            setTexture(data.Object, texId)
+        else
+            restoreObject(data.Object)
+        end
+    end
+end
 
 local function processIfTexture(obj)
 	if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
 		task.defer(function()
-			local scope = register(obj)
-			if scope and (states.MatrixScope or states.VoidScope) then apply(scope) end
+			if register(obj) then apply() end
 		end)
 	end
 end
@@ -285,7 +304,7 @@ local function updateNearestDisplay()
     local character = Player.Character
     local root = character and character:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
-
+    
     local nearest, nearestDistance = nil, 10
     for _, object in ipairs(Workspace:GetDescendants()) do
         if object.Name == "GunDisplay" or object.Name == "DisplayRefGun" then
@@ -293,17 +312,17 @@ local function updateNearestDisplay()
             if object:IsA("BasePart") then part = object
             elseif object:IsA("Model") then part = object.PrimaryPart or object:FindFirstChildWhichIsA("BasePart", true)
             elseif object:IsA("Tool") then part = object:FindFirstChild("Handle", true) end
-
+            
             if part and part:IsA("BasePart") then
                 local distance = (part.Position - root.Position).Magnitude
-                if distance < nearestDistance then
+                if distance < nearestDistance then 
                     nearestDistance = distance
-                    nearest = object
+                    nearest = object 
                 end
             end
         end
     end
-
+    
     if nearest ~= nearestDisplayCache then
         nearestDisplayCache = nearest
         if nearestDisplayCache then
@@ -352,7 +371,7 @@ local function isMyWeapon(obj)
     return false
 end
 
-local function setTexture(obj, id)
+function setTexture(obj, id)
 	local value = "rbxassetid://" .. id
 	if obj:IsA("MeshPart") then
 		saveOriginal(obj, "TextureID")
@@ -364,36 +383,20 @@ local function setTexture(obj, id)
 end
 
 function register(obj)
-	if not isMyWeapon(obj) then return nil end
+	if not isMyWeapon(obj) then return false end
 
 	if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
 		pcall(function() obj:Destroy() end)
-		return nil
+		return false
 	end
+	
+	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return false end
 
-	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return nil end
-
-	local scope = states.VoidScope and "VoidScope" or "MatrixScope"
-
-	for _, data in ipairs(targets[scope]) do
-		if data.Object == obj then return scope end
+	for _, data in ipairs(targets) do
+		if data.Object == obj then return true end
 	end
-	table.insert(targets[scope], {Object = obj})
-	return scope
-end
-
-function apply(scope)
-	local texId = (scope == "MatrixScope") and selectedTextureMatrix or selectedTextureVoid
-	for i = #targets[scope], 1, -1 do
-		local data = targets[scope][i]
-		if not data.Object or not data.Object.Parent then
-			table.remove(targets[scope], i)
-		elseif states[scope] then
-			setTexture(data.Object, texId)
-		else
-			restoreObject(data.Object)
-		end
-	end
+	table.insert(targets, {Object = obj})
+	return true
 end
 
 local Window = UILibrary:CreateWindow({
@@ -404,12 +407,22 @@ local Window = UILibrary:CreateWindow({
 
 Window:AddToggle("MatrixScope", function(state)
 	states.MatrixScope = state
-	apply("MatrixScope")
+    if state then 
+        activeMode = "MatrixScope" 
+    elseif activeMode == "MatrixScope" then 
+        activeMode = states.VoidScope and "VoidScope" or "None" 
+    end
+	apply()
 end)
 
 Window:AddToggle("VoidScope", function(state)
 	states.VoidScope = state
-	apply("VoidScope")
+    if state then 
+        activeMode = "VoidScope" 
+    elseif activeMode == "VoidScope" then 
+        activeMode = states.MatrixScope and "MatrixScope" or "None" 
+    end
+	apply()
 end)
 
 Window:AddSection("MatrixScope Textures")
@@ -421,7 +434,7 @@ for _, info in ipairs(TEXTURES) do
 		selectedTrailRainbowMatrix = preset.Rainbow or false
 		selectedTrailColorMatrix = preset.Rainbow and nil or (preset.Color or TRAIL_PURPLE)
 		selectedTrailColorMatrix2 = preset.Color2
-		if states.MatrixScope then apply("MatrixScope") end
+		if activeMode == "MatrixScope" then apply() end
 	end)
 end
 
@@ -434,7 +447,7 @@ for _, info in ipairs(VOID_TEXTURES) do
 		selectedTrailRainbowVoid = preset.Rainbow or false
 		selectedTrailColorVoid = preset.Rainbow and nil or (preset.Color or TRAIL_VOID_CYAN)
 		selectedTrailColorVoid2 = preset.Color2
-		if states.VoidScope then apply("VoidScope") end
+		if activeMode == "VoidScope" then apply() end
 	end)
 end
 
@@ -451,15 +464,14 @@ for _, info in ipairs(OLD_TEXTURES) do
 		selectedTrailColorVoid = preset.Color or TRAIL_VOID_CYAN
 		selectedTrailColorMatrix2 = preset.Color2
 		selectedTrailColorVoid2 = preset.Color2
-		if states.MatrixScope then apply("MatrixScope") end
-		if states.VoidScope then apply("VoidScope") end
+		if activeMode ~= "None" then apply() end
 	end)
 end
 
 local function getActiveTrail()
-	if states.MatrixScope then
+	if activeMode == "MatrixScope" then
 		return selectedTrailColorMatrix, selectedTrailRainbowMatrix
-	elseif states.VoidScope then
+	elseif activeMode == "VoidScope" then
 		return selectedTrailColorVoid, selectedTrailRainbowVoid
 	end
 	return nil, false
@@ -491,7 +503,7 @@ local function colorBeamOrPart(obj, activeColor, activeRainbow)
 end
 
 RunService.RenderStepped:Connect(function()
-	if not states.MatrixScope and not states.VoidScope then return end
+	if activeMode == "None" then return end
 	local activeColor, activeRainbow = getActiveTrail()
 	if not activeColor and not activeRainbow then return end
 
@@ -510,7 +522,7 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end
-
+	
 	if nearestDisplayCache then
 		for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
 			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
@@ -518,7 +530,7 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 	end
-
+    
     local myFolder = Workspace:FindFirstChild(Player.Name)
     if myFolder then
         for _, obj in ipairs(myFolder:GetDescendants()) do
@@ -537,16 +549,16 @@ end
 
 Workspace.DescendantAdded:Connect(function(object)
 	processIfTexture(object)
-
-	if not states.MatrixScope and not states.VoidScope then return end
+	
+	if activeMode == "None" then return end
 	task.defer(function()
 		if not object.Parent then return end
-
+		
 		local shot = findShotContainer(object)
 		if shot then
 			local ownerId = shot:GetAttribute("OwnerUserId")
 			local isOurs = false
-
+			
 			if ownerId == Player.UserId then
 				isOurs = true
 			elseif ownerId == nil then
@@ -555,15 +567,15 @@ Workspace.DescendantAdded:Connect(function(object)
 					local pos = nil
 					if object:IsA("BasePart") then pos = object.Position
 					elseif object:IsA("Attachment") then pos = object.WorldPosition
-					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition
+					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition 
 					elseif object:IsA("Trail") and object.Attachment0 then pos = object.Attachment0.WorldPosition end
-
+					
 					if pos and (pos - root.Position).Magnitude < 15 then
 						isOurs = true
 					end
 				end
 			end
-
+			
 			if isOurs then
 				local activeColor, activeRainbow = getActiveTrail()
 				colorBeamOrPart(shot, activeColor, activeRainbow)
@@ -618,7 +630,6 @@ Player.CharacterAdded:Connect(function(char)
         if bp then
             setupContainer(bp)
         end
-        if states.MatrixScope then apply("MatrixScope") end
-        if states.VoidScope then apply("VoidScope") end
+        if activeMode ~= "None" then apply() end
     end)
 end)
