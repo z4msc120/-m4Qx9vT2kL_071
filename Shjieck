@@ -19,7 +19,7 @@ local Whitelist = {
     ["hi1235010"] = true,
     ["izanmartin13"] = true,
     ["ikeaaaa_4"] = true,
-    ["tozety45"] = true,
+    ["ikeaaa_4"] = true,
     ["antoniommvnz"] = true,
     ["iigouhstlish"] = true,
     ["rrhsngb"] = true,
@@ -325,27 +325,18 @@ local function updateNearestDisplay()
     
     if nearest ~= nearestDisplayCache then
         nearestDisplayCache = nearest
-        if nearestDisplayCache then
-            for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
-                processIfTexture(obj)
-            end
-        end
     end
 end
-
-task.spawn(function()
-    while task.wait(0.5) do
-        updateNearestDisplay()
-    end
-end)
 
 local function isMyWeapon(obj)
     local current = obj
     local validContainer = nil
+    local validName = nil
 
     while current and current ~= game do
-        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" then
+        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" or SHOT_NAMES[current.Name] then
             validContainer = current
+            validName = current.Name
             break
         end
         current = current.Parent
@@ -353,14 +344,14 @@ local function isMyWeapon(obj)
 
     if not validContainer then return false end
 
-    if validContainer.Name == "Gun" then
+    if validName == "Gun" or SHOT_NAMES[validName] then
         if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
         if Player:FindFirstChild("Backpack") and validContainer:IsDescendantOf(Player:FindFirstChild("Backpack")) then return true end
         if Camera and validContainer:IsDescendantOf(Camera) then return true end
         return false
     end
 
-    if validContainer.Name == "GunDisplay" or validContainer.Name == "DisplayRefGun" then
+    if validName == "GunDisplay" or validName == "DisplayRefGun" then
         if Camera and validContainer:IsDescendantOf(Camera) then return true end
         if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
         if validContainer:FindFirstAncestor(Player.Name) then return true end
@@ -393,7 +384,7 @@ function register(obj)
 	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return false end
 
 	for _, data in ipairs(targets) do
-		if data.Object == obj then return true end
+		if data.Object == obj then return false end
 	end
 	table.insert(targets, {Object = obj})
 	return true
@@ -577,49 +568,35 @@ Workspace.DescendantAdded:Connect(function(object)
 	end)
 end)
 
-Camera.DescendantAdded:Connect(function(obj)
-	processIfTexture(obj)
-end)
-
-local function setupContainer(container)
-    if not container then return end
-    for _, obj in ipairs(container:GetDescendants()) do
-        processIfTexture(obj)
-    end
-    container.DescendantAdded:Connect(function(obj)
-        processIfTexture(obj)
-    end)
-end
-
 task.spawn(function()
-    updateNearestDisplay()
-    for _, obj in ipairs(Workspace:GetDescendants()) do
-        processIfTexture(obj)
-    end
-    for _, obj in ipairs(Camera:GetDescendants()) do
-        processIfTexture(obj)
-    end
-    if Player.Character then
-        setupContainer(Player.Character)
-    end
-    local bp = Player:FindFirstChild("Backpack")
-    if bp then
-        setupContainer(bp)
-    end
-end)
-
-Player.CharacterAdded:Connect(function(char)
-    setupContainer(char)
-    task.spawn(function()
-        task.wait(0.5)
+    while task.wait(1) do
         updateNearestDisplay()
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            processIfTexture(obj)
+        
+        local char = Player.Character
+        if char then
+            for _, obj in ipairs(char:GetDescendants()) do
+                processIfTexture(obj)
+            end
         end
-        local bp = Player:WaitForChild("Backpack", 5)
+        
+        local bp = Player:FindFirstChild("Backpack")
         if bp then
-            setupContainer(bp)
+            for _, obj in ipairs(bp:GetDescendants()) do
+                processIfTexture(obj)
+            end
         end
-        if activeMode ~= "None" then apply() end
-    end)
+        
+        local myFolder = Workspace:FindFirstChild(Player.Name)
+        if myFolder then
+            for _, obj in ipairs(myFolder:GetDescendants()) do
+                processIfTexture(obj)
+            end
+        end
+        
+        if nearestDisplayCache then
+            for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
+                processIfTexture(obj)
+            end
+        end
+    end
 end)
