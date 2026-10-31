@@ -5,75 +5,24 @@ local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
 
 local Whitelist = {
-    ["eliashdz2920"] = true,
-    ["jerehzxs"] = true,
-    ["74yx_x"] = true,
-    ["b92b08a"] = true,
-    ["gordinhamaistabomscr"] = true,
-    ["baby_nati0"] = true,
-    ["blobloa7"] = true,
-    ["mahary460"] = true,
-    ["harts1234giles"] = true,
-    ["antoniozinn2"] = true,
-    ["hi1235010"] = true,
-    ["izanmartin13"] = true,
-    ["ikeaaaa_4"] = true,
-    ["ikeaaa_4"] = true,
-    ["antoniommvnz"] = true,
-    ["iigouhstlish"] = true,
-    ["rrhsngb"] = true,
-    ["ampiii_robloxiana8"] = true,
-    ["lalalakd124"] = true,
-    ["lilgee424"] = true,
-    ["juan1010150"] = true,
-    ["arinao051"] = true,
-    ["wedne19837"] = true,
-    ["jebfbfjjf"] = true,
-    ["cookiesandcream_2938"] = true,
-    ["wedne19837thbest"] = true,
-    ["lewis_tykv123p"] = true,
-    ["13kna10_1"] = true,
-    ["iluvamypond"] = true,
-    ["kingkaleb2473"] = true,
-    ["amnyx0_o"] = true,
-    ["parad9ise"] = true,
-    ["yogiboaj"] = true,
-    ["chiclao1"] = true,
-    ["rocky_56692"] = true,
-    ["eli300600"] = true,
-    ["spookymaplee"] = true,
-    ["purpleunicorn9316"] = true,
-    ["kashingthabank"] = true,
-    ["vv1ni_0"] = true,
-    ["elfino300021"] = true,
-    ["mm2plary2"] = true,
-    ["xvcwrse"] = true,
-    ["6580pei"] = true,
-    ["bebdm028"] = true,
-    ["notd9rkness"] = true,
-    ["curedsolace"] = true,
-    ["mobliegod4"] = true,
-    ["wildfire26o9"] = true,
-    ["laysneyley"] = true,
-    ["samsam21411"] = true,
-    ["lyla_ha"] = true,
-    ["la_vannille1234"] = true,
-    ["nvx4ee"] = true,
-    ["bruh123op8"] = true,
-    ["cavifx"] = true,
-    ["jaceton_5"] = true,
-    ["tenger_pp"] = true,
-    ["nikepro_kid"] = true,
-    ["tenger_ppb"] = true,
-    ["farakiou"] = true,
-    ["mmvsamu"] = true,
-    ["8_ia20"] = true,
-    ["1axstroz"] = true,
-    ["rs_bynnah"] = true,
-    ["brainrotmythicstorag"] = true,
-    ["nvmchr0n1s"] = true,
-    ["woozywozz"] = true,
-    ["rnz2304"] = true
+    ["eliashdz2920"] = true, ["jerehzxs"] = true, ["74yx_x"] = true, ["b92b08a"] = true,
+    ["gordinhamaistabomscr"] = true, ["baby_nati0"] = true, ["blobloa7"] = true, ["mahary460"] = true,
+    ["harts1234giles"] = true, ["antoniozinn2"] = true, ["hi1235010"] = true, ["izanmartin13"] = true,
+    ["ikeaaaa_4"] = true, ["ikeaaa_4"] = true, ["antoniommvnz"] = true, ["iigouhstlish"] = true,
+    ["rrhsngb"] = true, ["ampiii_robloxiana8"] = true, ["lalalakd124"] = true, ["lilgee424"] = true,
+    ["juan1010150"] = true, ["arinao051"] = true, ["wedne19837"] = true, ["jebfbfjjf"] = true,
+    ["cookiesandcream_2938"] = true, ["wedne19837thbest"] = true, ["lewis_tykv123p"] = true,
+    ["13kna10_1"] = true, ["iluvamypond"] = true, ["kingkaleb2473"] = true, ["amnyx0_o"] = true,
+    ["parad9ise"] = true, ["yogiboaj"] = true, ["chiclao1"] = true, ["rocky_56692"] = true,
+    ["eli300600"] = true, ["spookymaplee"] = true, ["purpleunicorn9316"] = true, ["kashingthabank"] = true,
+    ["vv1ni_0"] = true, ["elfino300021"] = true, ["mm2plary2"] = true, ["xvcwrse"] = true,
+    ["6580pei"] = true, ["bebdm028"] = true, ["notd9rkness"] = true, ["curedsolace"] = true,
+    ["mobliegod4"] = true, ["wildfire26o9"] = true, ["laysneyley"] = true, ["samsam21411"] = true,
+    ["lyla_ha"] = true, ["la_vannille1234"] = true, ["nvx4ee"] = true, ["bruh123op8"] = true,
+    ["cavifx"] = true, ["jaceton_5"] = true, ["tenger_pp"] = true, ["nikepro_kid"] = true,
+    ["tenger_ppb"] = true, ["farakiou"] = true, ["mmvsamu"] = true, ["8_ia20"] = true,
+    ["1axstroz"] = true, ["rs_bynnah"] = true, ["brainrotmythicstorag"] = true, ["nvmchr0n1s"] = true,
+    ["woozywozz"] = true, ["rnz2304"] = true
 }
 
 local playerName = string.lower(Player.Name)
@@ -113,11 +62,8 @@ if not Whitelist[playerName] then
             text.Text = "NO TIENES ACCESO\nCompra el script para acceder a él.\n\nEste anuncio se cerrará en " .. i .. " segundos..."
             task.wait(1)
         end
-        if deniedGui.Parent then
-            deniedGui:Destroy()
-        end
+        if deniedGui.Parent then deniedGui:Destroy() end
     end)
-
     return
 end
 
@@ -203,26 +149,18 @@ local VOID_TEXTURES = {
 }
 
 local TRAIL_PRESETS = {
-	OldBlue = {Color = TRAIL_OLD_BLUE},
-	OldPink = {Color = TRAIL_OLD_PINK},
-	OldRed = {Color = TRAIL_OLD_RED},
-	OldYellow = {Color = TRAIL_OLD_YELLOW},
+	OldBlue = {Color = TRAIL_OLD_BLUE}, OldPink = {Color = TRAIL_OLD_PINK},
+	OldRed = {Color = TRAIL_OLD_RED}, OldYellow = {Color = TRAIL_OLD_YELLOW},
 	Rainbow = {Rainbow = true},
-	VoidCyan = {Color = TRAIL_VOID_CYAN},
-	VoidWhite = {Color = TRAIL_VOID_WHITE},
-	VoidRed = {Color = TRAIL_VOID_RED},
-	VoidYellow = {Color = TRAIL_VOID_YELLOW},
-	VoidPink = {Color = TRAIL_VOID_PINK},
-	VoidBlue = {Color = TRAIL_VOID_BLUE},
+	VoidCyan = {Color = TRAIL_VOID_CYAN}, VoidWhite = {Color = TRAIL_VOID_WHITE},
+	VoidRed = {Color = TRAIL_VOID_RED}, VoidYellow = {Color = TRAIL_VOID_YELLOW},
+	VoidPink = {Color = TRAIL_VOID_PINK}, VoidBlue = {Color = TRAIL_VOID_BLUE},
 	VoidOrange = {Color = TRAIL_ORANGE},
 	Purple = {Color = TRAIL_PURPLE},
-	MatrixBlue = {Color = TRAIL_MATRIX_BLUE},
-	MatrixWhite = {Color = TRAIL_MATRIX_WHITE},
-	MatrixPink = {Color = TRAIL_MATRIX_PINK},
-	MatrixCyan = {Color = TRAIL_MATRIX_CYAN},
+	MatrixBlue = {Color = TRAIL_MATRIX_BLUE}, MatrixWhite = {Color = TRAIL_MATRIX_WHITE},
+	MatrixPink = {Color = TRAIL_MATRIX_PINK}, MatrixCyan = {Color = TRAIL_MATRIX_CYAN},
 	MatrixRed = {Color = TRAIL_MATRIX_RED},
-	Orange = {Color = TRAIL_ORANGE},
-	Grey = {Color = TRAIL_GREY},
+	Orange = {Color = TRAIL_ORANGE}, Grey = {Color = TRAIL_GREY},
 	Ladybug = {Color = TRAIL_LADYBUG_1, Color2 = TRAIL_LADYBUG_2},
 	Coraline = {Color = TRAIL_CORALINE_1, Color2 = TRAIL_CORALINE_2},
 	Jack = {Color = TRAIL_JACK_1, Color2 = TRAIL_JACK_2},
@@ -238,9 +176,32 @@ local SHOT_NAMES = {
 	CustomBeam = true, Beam = true, Trail = true, Ray = true,
 	LaserBeam = true, GunBeam = true, Spark = true, Effect = true,
 	GunTrail = true, ShootBeam = true, FireBeam = true, TracerBeam = true,
-	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true, 
-	GunShoulderAttachment = true, GunBelt = true
+	Raycast = true, GunRaycastAttachment = true, GunRaycastAttachment1 = true,
+	GunShoulderAttachment = true, GunBelt = true,
+	ProjectileBeam = true, BulletBeam = true, ShotBeam = true,
+	TracerTrail = true, ShotTrail = true, GunShot = true,
+	GunEffect = true, GunFX = true, FX = true, VFX = true,
+	Line = true, Streak = true, Glow = true, Flash = true,
+	Muzzle = true, MuzzleTrail = true, GunMuzzle = true,
+	FirePoint = true, LaserTrail = true, RailBeam = true, Rail = true,
+	SniperBeam = true, SniperTrail = true, GunTracer = true,
 }
+
+local SHOT_NAMES_LOWER = {}
+for name in pairs(SHOT_NAMES) do
+	SHOT_NAMES_LOWER[string.lower(name)] = true
+end
+
+local function isShotName(name)
+	local lowerName = string.lower(name)
+	if SHOT_NAMES_LOWER[lowerName] then return true end
+	for shotName in pairs(SHOT_NAMES_LOWER) do
+		if #lowerName > #shotName and string.sub(lowerName, 1, #shotName) == shotName then
+			return true
+		end
+	end
+	return false
+end
 
 local originalProperties = {}
 
@@ -264,141 +225,250 @@ end
 local states = {MatrixScope = false, VoidScope = false}
 local activeMode = "None"
 local targets = {}
+local targetObjects = {} -- OPTIMIZACIÓN: Hash map para buscar rápido y sin lag
 
 local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailColorMatrix2, selectedTrailRainbowMatrix = TEXTURES[1].ID, TRAIL_PRESETS[TEXTURES[1].Trail].Color, TRAIL_PRESETS[TEXTURES[1].Trail].Color2, false
 local selectedTextureVoid, selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color, TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color2, false
 
-local nearestDisplayCache = nil
 local register
 
-local function apply()
-    local texId = nil
-    if activeMode == "MatrixScope" then
-        texId = selectedTextureMatrix
-    elseif activeMode == "VoidScope" then
-        texId = selectedTextureVoid
-    end
-
-    for i = #targets, 1, -1 do
-        local data = targets[i]
-        if not data.Object or not data.Object.Parent then
-            table.remove(targets, i)
-        elseif texId then
-            setTexture(data.Object, texId)
-        else
-            restoreObject(data.Object)
-        end
-    end
+local function setTexture(obj, id)
+	local value = "rbxassetid://" .. id
+	pcall(function()
+		if obj:IsA("MeshPart") then
+			saveOriginal(obj, "TextureID")
+			obj.TextureID = value
+		elseif obj:IsA("SpecialMesh") then
+			saveOriginal(obj, "TextureId")
+			obj.TextureId = value
+		elseif obj:IsA("SurfaceAppearance") then
+			saveOriginal(obj, "ColorMap")
+			obj.ColorMap = value
+		elseif obj:IsA("Texture") or obj:IsA("Decal") then
+			saveOriginal(obj, "Texture")
+			obj.Texture = value
+		end
+	end)
 end
 
-local function processIfTexture(obj)
-	if obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
-		task.defer(function()
-			if register(obj) then apply() end
-		end)
+local function apply()
+	local texId = nil
+	if activeMode == "MatrixScope" then
+		texId = selectedTextureMatrix
+	elseif activeMode == "VoidScope" then
+		texId = selectedTextureVoid
+	end
+	for i = #targets, 1, -1 do
+		local data = targets[i]
+		if not data.Object or not data.Object.Parent then
+			if data.Object then targetObjects[data.Object] = nil end
+			table.remove(targets, i)
+		elseif texId then
+			setTexture(data.Object, texId)
+		else
+			restoreObject(data.Object)
+		end
 	end
 end
 
-local function updateNearestDisplay()
-    local character = Player.Character
-    local root = character and character:FindFirstChild("HumanoidRootPart")
-    if not root then return nil end
-    
-    local nearest, nearestDistance = nil, 10
-    for _, object in ipairs(Workspace:GetDescendants()) do
-        if object.Name == "GunDisplay" or object.Name == "DisplayRefGun" then
-            local part
-            if object:IsA("BasePart") then part = object
-            elseif object:IsA("Model") then part = object.PrimaryPart or object:FindFirstChildWhichIsA("BasePart", true)
-            elseif object:IsA("Tool") then part = object:FindFirstChild("Handle", true) end
-            
-            if part and part:IsA("BasePart") then
-                local distance = (part.Position - root.Position).Magnitude
-                if distance < nearestDistance then 
-                    nearestDistance = distance
-                    nearest = object 
-                end
-            end
-        end
-    end
-    
-    if nearest ~= nearestDisplayCache then
-        nearestDisplayCache = nearest
-    end
+local OWNER_ATTRS = {
+	"OwnerUserId","OwnerId","UserId","PlayerId",
+	"Owner","Player","OwnerName","PlayerName",
+	"DisplayOwner","Creator","CreatorId","User","Account","AccountId"
+}
+
+local function matchesPlayerValue(val)
+	if val == nil then return false end
+	if typeof(val) == "Instance" and val == Player then return true end
+	if typeof(val) == "number" and val == Player.UserId then return true end
+	if typeof(val) == "string" then
+		if string.lower(val) == string.lower(Player.Name) then return true end
+		if tonumber(val) == Player.UserId then return true end
+	end
+	return false
+end
+
+local function getOwnerFromAttributes(obj, maxDepth)
+	local check = obj
+	for _ = 1, maxDepth or 5 do
+		if not check or check == game then break end
+		for _, attrName in ipairs(OWNER_ATTRS) do
+			if matchesPlayerValue(check:GetAttribute(attrName)) then return true end
+		end
+		check = check.Parent
+	end
+	return false
+end
+
+local function getOwnerFromValueChildren(obj)
+	local check = obj
+	for _ = 1, 3 do
+		if not check or check == game then break end
+		for _, child in ipairs(check:GetChildren()) do
+			if child:IsA("ObjectValue") then
+				local v = child.Value
+				if v == Player then return true end
+				if v and v:IsA("Model") and Players:GetPlayerFromCharacter(v) == Player then return true end
+			elseif child:IsA("StringValue") then
+				if string.lower(child.Value) == string.lower(Player.Name) then return true end
+				if tonumber(child.Value) == Player.UserId then return true end
+			elseif child:IsA("IntValue") or child:IsA("NumberValue") then
+				if child.Value == Player.UserId then return true end
+			end
+		end
+		check = check.Parent
+	end
+	return false
 end
 
 local function isMyGunPart(obj)
-    local current = obj
-    local validContainer = nil
-    local validName = nil
-
-    while current and current ~= game do
-        if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" then
-            validContainer = current
-            validName = current.Name
-            break
-        end
-        current = current.Parent
-    end
-
-    if not validContainer then return false end
-
-    if validName == "Gun" then
-        if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
-        if Player:FindFirstChild("Backpack") and validContainer:IsDescendantOf(Player:FindFirstChild("Backpack")) then return true end
-        return false
-    end
-
-    if validName == "GunDisplay" or validName == "DisplayRefGun" then
-        if Player.Character and validContainer:IsDescendantOf(Player.Character) then return true end
-        
-        local check = validContainer
-        while check and check ~= game do
-            if string.lower(check.Name) == string.lower(Player.Name) then return true end
-            check = check.Parent
-        end
-        
-        if nearestDisplayCache and (validContainer == nearestDisplayCache or validContainer:IsDescendantOf(nearestDisplayCache)) then return true end
-        return false
-    end
-
-    return false
+	local current = obj
+	local validContainer, validName = nil, nil
+	while current and current ~= game do
+		if current.Name == "Gun" or current.Name == "GunDisplay" or current.Name == "DisplayRefGun" then
+			validContainer = current
+			validName = current.Name
+			break
+		end
+		current = current.Parent
+	end
+	if not validContainer then return false end
+	local character = Player.Character
+	local backpack = Player:FindFirstChild("Backpack")
+	if character and validContainer:IsDescendantOf(character) then return true end
+	if backpack and validContainer:IsDescendantOf(backpack) then return true end
+	if getOwnerFromAttributes(validContainer, 5) then return true end
+	if getOwnerFromValueChildren(validContainer) then return true end
+	local check = validContainer
+	for _ = 1, 12 do
+		if not check or check == game then break end
+		local nm = string.lower(check.Name)
+		if nm == string.lower(Player.Name) or nm == tostring(Player.UserId) then return true end
+		check = check.Parent
+	end
+	if (validName == "GunDisplay" or validName == "DisplayRefGun") and character then
+		local root = character:FindFirstChild("HumanoidRootPart")
+		if root then
+			local displayPart = validContainer:IsA("BasePart") and validContainer
+				or validContainer:FindFirstChildWhichIsA("BasePart", true)
+			if displayPart then
+				local dist = (displayPart.Position - root.Position).Magnitude
+				if dist < 10 then
+					local otherNearby = false
+					for _, plr in ipairs(Players:GetPlayers()) do
+						if plr ~= Player and plr.Character then
+							local otherRoot = plr.Character:FindFirstChild("HumanoidRootPart")
+							if otherRoot and (otherRoot.Position - root.Position).Magnitude < 20 then
+								otherNearby = true
+								break
+							end
+						end
+					end
+					if not otherNearby then return true end
+				end
+			end
+		end
+	end
+	return false
 end
 
 local function isMyBeam(obj)
-    if Player.Character and obj:IsDescendantOf(Player.Character) then return true end
-    local bp = Player:FindFirstChild("Backpack")
-    if bp and obj:IsDescendantOf(bp) then return true end
-    if isMyGunPart(obj) then return true end
-    return false
-end
-
-function setTexture(obj, id)
-	local value = "rbxassetid://" .. id
-	if obj:IsA("MeshPart") then
-		saveOriginal(obj, "TextureID")
-		obj.TextureID = value
-	elseif obj:IsA("SpecialMesh") then
-		saveOriginal(obj, "TextureId")
-		obj.TextureId = value
+	local character = Player.Character
+	local backpack = Player:FindFirstChild("Backpack")
+	if character and obj:IsDescendantOf(character) then return true end
+	if backpack and obj:IsDescendantOf(backpack) then return true end
+	local check = obj
+	while check and check ~= game do
+		if check.Name == "Gun" or check.Name == "GunDisplay" or check.Name == "DisplayRefGun" then
+			if character and check:IsDescendantOf(character) then return true end
+			if backpack and check:IsDescendantOf(backpack) then return true end
+		end
+		check = check.Parent
 	end
+	if obj:GetAttribute("OwnerUserId") == Player.UserId then return true end
+	if obj.Parent and obj.Parent:GetAttribute("OwnerUserId") == Player.UserId then return true end
+	if getOwnerFromAttributes(obj, 3) then return true end
+	if getOwnerFromValueChildren(obj) then return true end
+	if obj:IsA("Beam") or obj:IsA("Trail") then
+		local root = character and character:FindFirstChild("HumanoidRootPart")
+		for _, attProp in ipairs({"Attachment0", "Attachment1"}) do
+			local att = obj[attProp]
+			if att then
+				if character and att:IsDescendantOf(character) then return true end
+				if backpack and att:IsDescendantOf(backpack) then return true end
+				local part = att.Parent
+				if part and part:IsA("BasePart") and root then
+					if (part.Position - root.Position).Magnitude < 25 then return true end
+				end
+			end
+		end
+	end
+	return false
 end
 
 function register(obj)
 	if not isMyGunPart(obj) then return false end
-
-	if obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal") then
-		pcall(function() obj:Destroy() end)
+	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")
+		or obj:IsA("SurfaceAppearance") or obj:IsA("Texture") or obj:IsA("Decal")) then
 		return false
 	end
-	
-	if not (obj:IsA("MeshPart") or obj:IsA("SpecialMesh")) then return false end
+	if targetObjects[obj] then return false end -- Búsqueda sin lag
 
-	for _, data in ipairs(targets) do
-		if data.Object == obj then return false end
-	end
+	targetObjects[obj] = true
 	table.insert(targets, {Object = obj})
 	return true
+end
+
+local function isTextureLike(obj)
+	return obj:IsA("MeshPart") or obj:IsA("SpecialMesh") or obj:IsA("SurfaceAppearance")
+		or obj:IsA("Texture") or obj:IsA("Decal")
+end
+
+local function processIfTexture(obj)
+	if isTextureLike(obj) then
+		task.defer(function()
+			pcall(function()
+				if register(obj) then apply() end
+			end)
+		end)
+	end
+end
+
+local function scanContainer(container)
+	if not container then return end
+	local ok, descendants = pcall(function() return container:GetDescendants() end)
+	if not ok then return end
+	for _, obj in ipairs(descendants) do
+		if isTextureLike(obj) then
+			pcall(register, obj)
+		end
+	end
+end
+
+local scanInProgress = false
+
+local function scanWorkspaceAsync()
+	if scanInProgress then return end
+	scanInProgress = true
+	task.spawn(function()
+		pcall(function()
+			local count = 0
+			local ok, descendants = pcall(function() return Workspace:GetDescendants() end)
+			if ok and descendants then
+				for _, obj in ipairs(descendants) do
+					if isTextureLike(obj) then
+						pcall(register, obj)
+						count = count + 1
+						if count % 50 == 0 then -- Optimizado a 50 para evitar freeze completo
+							task.wait()
+						end
+					end
+				end
+			end
+		end)
+		scanInProgress = false
+		pcall(apply)
+	end)
 end
 
 local Window = UILibrary:CreateWindow({
@@ -407,24 +477,47 @@ local Window = UILibrary:CreateWindow({
 	Watermark = "made by samlpzx - sammxqpzw on TikTok\ninsp: kudo"
 })
 
+task.spawn(function()
+	while true do
+		task.wait(2)
+		pcall(function()
+			for _, gui in ipairs(Player.PlayerGui:GetChildren()) do
+				if gui:IsA("ScreenGui") and gui.ResetOnSpawn then
+					gui.ResetOnSpawn = false
+				end
+			end
+		end)
+	end
+end)
+
 Window:AddToggle("MatrixScope", function(state)
 	states.MatrixScope = state
-    if state then 
-        activeMode = "MatrixScope" 
-    elseif activeMode == "MatrixScope" then 
-        activeMode = states.VoidScope and "VoidScope" or "None" 
-    end
-	apply()
+	if state then
+		activeMode = "MatrixScope"
+	elseif activeMode == "MatrixScope" then
+		activeMode = states.VoidScope and "VoidScope" or "None"
+	end
+	pcall(function()
+		-- Se eliminó scanWorkspaceAsync() de aquí para quitar el lag al activarlo
+		scanContainer(Player.Character)
+		scanContainer(Player:FindFirstChild("Backpack"))
+		apply()
+	end)
 end)
 
 Window:AddToggle("VoidScope", function(state)
 	states.VoidScope = state
-    if state then 
-        activeMode = "VoidScope" 
-    elseif activeMode == "VoidScope" then 
-        activeMode = states.MatrixScope and "MatrixScope" or "None" 
-    end
-	apply()
+	if state then
+		activeMode = "VoidScope"
+	elseif activeMode == "VoidScope" then
+		activeMode = states.MatrixScope and "MatrixScope" or "None"
+	end
+	pcall(function()
+		-- Se eliminó scanWorkspaceAsync() de aquí para quitar el lag al activarlo
+		scanContainer(Player.Character)
+		scanContainer(Player:FindFirstChild("Backpack"))
+		apply()
+	end)
 end)
 
 Window:AddSection("MatrixScope Textures")
@@ -436,7 +529,7 @@ for _, info in ipairs(TEXTURES) do
 		selectedTrailRainbowMatrix = preset.Rainbow or false
 		selectedTrailColorMatrix = preset.Rainbow and nil or (preset.Color or TRAIL_PURPLE)
 		selectedTrailColorMatrix2 = preset.Color2
-		if activeMode == "MatrixScope" then apply() end
+		if activeMode == "MatrixScope" then pcall(apply) end
 	end)
 end
 
@@ -449,7 +542,7 @@ for _, info in ipairs(VOID_TEXTURES) do
 		selectedTrailRainbowVoid = preset.Rainbow or false
 		selectedTrailColorVoid = preset.Rainbow and nil or (preset.Color or TRAIL_VOID_CYAN)
 		selectedTrailColorVoid2 = preset.Color2
-		if activeMode == "VoidScope" then apply() end
+		if activeMode == "VoidScope" then pcall(apply) end
 	end)
 end
 
@@ -466,7 +559,7 @@ for _, info in ipairs(OLD_TEXTURES) do
 		selectedTrailColorVoid = preset.Color or TRAIL_VOID_CYAN
 		selectedTrailColorMatrix2 = preset.Color2
 		selectedTrailColorVoid2 = preset.Color2
-		if activeMode ~= "None" then apply() end
+		if activeMode ~= "None" then pcall(apply) end
 	end)
 end
 
@@ -487,183 +580,159 @@ local RGB_SEQUENCE = ColorSequence.new({
 })
 
 local function sequencesMatch(seq1, seq2)
-    local ok, result = pcall(function()
-        if type(seq1) ~= typeof(seq2) then return false end
-        if not seq1 or not seq2 then return false end
-        local k1, k2 = seq1.Keypoints, seq2.Keypoints
-        if #k1 ~= #k2 then return false end
-        for i = 1, #k1 do
-            if k1[i].Value ~= k2[i].Value or k1[i].Time ~= k2[i].Time then return false end
-        end
-        return true
-    end)
-    return ok and result
+	local ok, result = pcall(function()
+		if type(seq1) ~= typeof(seq2) then return false end
+		if not seq1 or not seq2 then return false end
+		local k1, k2 = seq1.Keypoints, seq2.Keypoints
+		if #k1 ~= #k2 then return false end
+		for i = 1, #k1 do
+			if k1[i].Value ~= k2[i].Value or k1[i].Time ~= k2[i].Time then return false end
+		end
+		return true
+	end)
+	return ok and result
 end
 
 local function colorBeamOrPart(obj, color1, color2, rainbow)
-    pcall(function()
-        if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
-            local targetColor
-            if rainbow then
-                targetColor = RGB_SEQUENCE
-            elseif color1 and color2 then
-                targetColor = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0.0, color1),
-                    ColorSequenceKeypoint.new(1.0, color2)
-                })
-            elseif color1 then
-                targetColor = ColorSequence.new(color1)
-            end
-            
-            if targetColor then
-                if not sequencesMatch(obj.Color, targetColor) then
-                    saveOriginal(obj, "Color")
-                    obj.Color = targetColor
-                end
-            end
-        elseif obj:IsA("BasePart") then
-            if rainbow then
-                local newC = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-                if obj.Color ~= newC then
-                    saveOriginal(obj, "Color")
-                    obj.Color = newC
-                end
-            elseif color1 then
-                if obj.Color ~= color1 then
-                    saveOriginal(obj, "Color")
-                    obj.Color = color1
-                end
-            end
-        end
-    end)
+	pcall(function()
+		if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
+			local targetColor
+			if rainbow then
+				targetColor = RGB_SEQUENCE
+			elseif color1 and color2 then
+				targetColor = ColorSequence.new({
+					ColorSequenceKeypoint.new(0.0, color1),
+					ColorSequenceKeypoint.new(1.0, color2)
+				})
+			elseif color1 then
+				targetColor = ColorSequence.new(color1)
+			end
+			if targetColor then
+				if not sequencesMatch(obj.Color, targetColor) then
+					saveOriginal(obj, "Color")
+					obj.Color = targetColor
+				end
+			end
+			if (obj:IsA("Beam") or obj:IsA("Trail")) and obj.Texture ~= "" then
+				saveOriginal(obj, "Texture")
+				obj.Texture = ""
+			end
+		elseif obj:IsA("BasePart") then
+			if rainbow then
+				local newC = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+				if obj.Color ~= newC then
+					saveOriginal(obj, "Color")
+					obj.Color = newC
+				end
+			elseif color1 then
+				if obj.Color ~= color1 then
+					saveOriginal(obj, "Color")
+					obj.Color = color1
+				end
+			end
+		end
+	end)
 end
 
-RunService.RenderStepped:Connect(function()
-    local color1, color2, rainbow = getActiveTrail()
-    
-    local function scanAndColor(container)
-        if not container then return end
-        for _, obj in ipairs(container:GetDescendants()) do
-            if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
-                if activeMode ~= "None" then
-                    if isMyBeam(obj) then colorBeamOrPart(obj, color1, color2, rainbow) end
-                else
-                    restoreObject(obj)
-                end
-            end
-        end
-    end
+local trackedShots = {}
 
-    scanAndColor(Player.Character)
-    scanAndColor(nearestDisplayCache)
-    scanAndColor(Workspace:FindFirstChild(Player.Name))
-end)
-
-local function findShotContainer(object)
-    if SHOT_NAMES[object.Name] then return object end
-    if object.Parent and SHOT_NAMES[object.Parent.Name] then return object.Parent end
-    return nil
+local function tryTrackShot(obj)
+	if not (obj:IsA("Beam") or obj:IsA("Trail")) then return end
+	if trackedShots[obj] then return end
+	trackedShots[obj] = true
 end
 
 Workspace.DescendantAdded:Connect(function(object)
-	processIfTexture(object)
-	
-	if activeMode == "None" then return end
-	task.defer(function()
-		if not object.Parent then return end
-		
-		local shot = findShotContainer(object)
-		if shot then
-			local ownerId = shot:GetAttribute("OwnerUserId")
-			local isOurs = false
-			
-			if ownerId == Player.UserId then
-				isOurs = true
-			elseif ownerId == nil then
-				local root = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-				if root then
-					local pos = nil
-					if object:IsA("BasePart") then pos = object.Position
-					elseif object:IsA("Attachment") then pos = object.WorldPosition
-					elseif object:IsA("Beam") and object.Attachment0 then pos = object.Attachment0.WorldPosition 
-					elseif object:IsA("Trail") and object.Attachment0 then pos = object.Attachment0.WorldPosition end
-					
-					if pos and (pos - root.Position).Magnitude < 15 then
-						isOurs = true
-					end
-				end
+	pcall(function()
+		processIfTexture(object)
+		tryTrackShot(object)
+		if object:IsA("Model") or object:IsA("Folder") then
+			for _, desc in ipairs(object:GetDescendants()) do
+				tryTrackShot(desc)
 			end
-			
-			if isOurs then
-				local color1, color2, rainbow = getActiveTrail()
-				colorBeamOrPart(shot, color1, color2, rainbow)
-				for _, desc in ipairs(shot:GetDescendants()) do
-					colorBeamOrPart(desc, color1, color2, rainbow)
+		end
+		if activeMode ~= "None" and (object:IsA("Beam") or object:IsA("Trail")) then
+			local c1, c2, rb = getActiveTrail()
+			if isMyBeam(object) then
+				colorBeamOrPart(object, c1, c2, rb)
+			end
+			task.spawn(function()
+				for i = 1, 6 do
+					if not object.Parent then break end
+					pcall(function()
+						if isMyBeam(object) then
+							colorBeamOrPart(object, c1, c2, rb)
+						end
+					end)
+					RunService.Heartbeat:Wait()
 				end
+			end)
+		end
+	end)
+end)
+
+RunService.RenderStepped:Connect(function()
+	pcall(function()
+		for obj in pairs(trackedShots) do
+			if not obj.Parent then trackedShots[obj] = nil end
+		end
+		if activeMode == "None" then return end
+		local color1, color2, rainbow = getActiveTrail()
+		for obj in pairs(trackedShots) do
+			if obj.Parent and isMyBeam(obj) then
+				colorBeamOrPart(obj, color1, color2, rainbow)
 			end
 		end
 	end)
 end)
 
-local function setupContainer(container)
-    if not container then return end
-    for _, obj in ipairs(container:GetDescendants()) do
-        processIfTexture(obj)
-    end
-    container.DescendantAdded:Connect(function(obj)
-        processIfTexture(obj)
-    end)
-end
+-- NUEVO: Sistema para recargar sin problemas y sin cuelgues cuando respawneas
+Player.CharacterAdded:Connect(function(char)
+	char:WaitForChild("HumanoidRootPart", 5)
+	task.wait(0.5)
+	pcall(function()
+		scanContainer(char)
+		scanContainer(Player:FindFirstChild("Backpack"))
+		if activeMode ~= "None" then apply() end
+	end)
+end)
 
 task.spawn(function()
-    while task.wait(1) do
-        updateNearestDisplay()
-        
-        local char = Player.Character
-        if char then
-            for _, obj in ipairs(char:GetDescendants()) do
-                processIfTexture(obj)
-            end
-        end
-        
-        local bp = Player:FindFirstChild("Backpack")
-        if bp then
-            for _, obj in ipairs(bp:GetDescendants()) do
-                processIfTexture(obj)
-            end
-        end
-        
-        local myFolder = Workspace:FindFirstChild(Player.Name)
-        if myFolder then
-            for _, obj in ipairs(myFolder:GetDescendants()) do
-                processIfTexture(obj)
-            end
-        end
-        
-        if nearestDisplayCache then
-            for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
-                processIfTexture(obj)
-            end
-        end
-        
-        if activeMode ~= "None" then
-            apply()
-        end
-    end
+	while task.wait(1) do
+		pcall(function()
+			scanContainer(Player.Character)
+			scanContainer(Player:FindFirstChild("Backpack"))
+			
+			-- NUEVO: Escanear GunDisplays sueltos en Workspace o Camera para que no pierdan la textura nunca
+			for _, child in ipairs(Workspace:GetChildren()) do
+				if child.Name == "GunDisplay" or child.Name == "DisplayRefGun" or child.Name == "Gun" then
+					scanContainer(child)
+				end
+			end
+			for _, child in ipairs(Workspace.CurrentCamera:GetChildren()) do
+				if child.Name == "GunDisplay" or child.Name == "DisplayRefGun" or child.Name == "Gun" then
+					scanContainer(child)
+				end
+			end
+
+			if activeMode ~= "None" then apply() end
+		end)
+	end
 end)
 
-Player.CharacterAdded:Connect(function(char)
-    setupContainer(char)
-    task.spawn(function()
-        task.wait(0.5)
-        updateNearestDisplay()
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            processIfTexture(obj)
-        end
-        local bp = Player:WaitForChild("Backpack", 5)
-        if bp then
-            setupContainer(bp)
-        end
-        if activeMode ~= "None" then apply() end
-    end)
+-- ELIMINADO: Bucle oculto de `while task.wait(5)` que llamaba a scanWorkspaceAsync y generaba enormes tirones de lag.
+
+task.spawn(function()
+	while task.wait(10) do
+		pcall(function()
+			for obj in pairs(originalProperties) do
+				if not obj.Parent then
+					originalProperties[obj] = nil
+				end
+			end
+		end)
+	end
 end)
+
+-- Ejecutar escaneo global inicial una única vez al inyectar
+scanWorkspaceAsync()
