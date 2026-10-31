@@ -18,8 +18,8 @@ local Whitelist = {
     ["antoniozinn2"] = true,
     ["hi1235010"] = true,
     ["izanmartin13"] = true,
-    ["tozety45"] = true,
     ["ikeaaaa_4"] = true,
+    ["tozety45"] = true,
     ["antoniommvnz"] = true,
     ["iigouhstlish"] = true,
     ["rrhsngb"] = true,
@@ -470,11 +470,11 @@ end
 
 local function getActiveTrail()
 	if activeMode == "MatrixScope" then
-		return selectedTrailColorMatrix, selectedTrailRainbowMatrix
+		return selectedTrailColorMatrix, selectedTrailColorMatrix2, selectedTrailRainbowMatrix
 	elseif activeMode == "VoidScope" then
-		return selectedTrailColorVoid, selectedTrailRainbowVoid
+		return selectedTrailColorVoid, selectedTrailColorVoid2, selectedTrailRainbowVoid
 	end
-	return nil, false
+	return nil, nil, false
 end
 
 local RGB_SEQUENCE = ColorSequence.new({
@@ -484,61 +484,51 @@ local RGB_SEQUENCE = ColorSequence.new({
 	ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0)),
 })
 
-local function colorBeamOrPart(obj, activeColor, activeRainbow)
-    if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
-        saveOriginal(obj, "Color")
-        if activeRainbow then
-            obj.Color = RGB_SEQUENCE
-        else
-            obj.Color = ColorSequence.new(activeColor)
+local function colorBeamOrPart(obj, color1, color2, rainbow)
+    pcall(function()
+        if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") then
+            saveOriginal(obj, "Color")
+            if rainbow then
+                obj.Color = RGB_SEQUENCE
+            elseif color1 and color2 then
+                obj.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0.0, color1),
+                    ColorSequenceKeypoint.new(1.0, color2)
+                })
+            elseif color1 then
+                obj.Color = ColorSequence.new(color1)
+            end
+        elseif obj:IsA("BasePart") then
+            saveOriginal(obj, "Color")
+            if rainbow then
+                obj.Color = Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255))
+            elseif color1 then
+                obj.Color = color1
+            end
         end
-    elseif obj:IsA("BasePart") then
-        saveOriginal(obj, "Color")
-        if activeRainbow then
-            obj.Color = Color3.fromRGB(math.random(100, 255), math.random(100, 255), math.random(100, 255))
-        else
-            obj.Color = activeColor
-        end
-    end
+    end)
 end
 
 RunService.RenderStepped:Connect(function()
-	if activeMode == "None" then return end
-	local activeColor, activeRainbow = getActiveTrail()
-	if not activeColor and not activeRainbow then return end
-
-	if Player.Character then
-		for _, obj in ipairs(Player.Character:GetDescendants()) do
-			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
-				if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
-			end
-		end
-	end
-
-	if Camera then
-		for _, obj in ipairs(Camera:GetDescendants()) do
-			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
-				if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
-			end
-		end
-	end
-	
-	if nearestDisplayCache then
-		for _, obj in ipairs(nearestDisplayCache:GetDescendants()) do
-			if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
-				colorBeamOrPart(obj, activeColor, activeRainbow)
-			end
-		end
-	end
+    local color1, color2, rainbow = getActiveTrail()
     
-    local myFolder = Workspace:FindFirstChild(Player.Name)
-    if myFolder then
-        for _, obj in ipairs(myFolder:GetDescendants()) do
+    local function scanAndColor(container)
+        if not container then return end
+        for _, obj in ipairs(container:GetDescendants()) do
             if obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("ParticleEmitter") or SHOT_NAMES[obj.Name] then
-                if isMyWeapon(obj) then colorBeamOrPart(obj, activeColor, activeRainbow) end
+                if activeMode ~= "None" then
+                    if isMyWeapon(obj) then colorBeamOrPart(obj, color1, color2, rainbow) end
+                else
+                    restoreObject(obj)
+                end
             end
         end
     end
+
+    scanAndColor(Player.Character)
+    scanAndColor(Camera)
+    scanAndColor(nearestDisplayCache)
+    scanAndColor(Workspace:FindFirstChild(Player.Name))
 end)
 
 local function findShotContainer(object)
@@ -577,10 +567,10 @@ Workspace.DescendantAdded:Connect(function(object)
 			end
 			
 			if isOurs then
-				local activeColor, activeRainbow = getActiveTrail()
-				colorBeamOrPart(shot, activeColor, activeRainbow)
+				local color1, color2, rainbow = getActiveTrail()
+				colorBeamOrPart(shot, color1, color2, rainbow)
 				for _, desc in ipairs(shot:GetDescendants()) do
-					colorBeamOrPart(desc, activeColor, activeRainbow)
+					colorBeamOrPart(desc, color1, color2, rainbow)
 				end
 			end
 		end
