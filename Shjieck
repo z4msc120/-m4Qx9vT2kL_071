@@ -130,12 +130,9 @@ local TEXTURES = {
     {Label = "Pink", ID = "108885925742672", Trail = "MatrixPink"}, {Label = "Cyan", ID = "99317531375655", Trail = "MatrixCyan"},
     {Label = "Red", ID = "87482398143669", Trail = "MatrixRed"}, {Label = "Halloween", ID = "115193257317497", Trail = "Orange"},
     {Label = "Grey", ID = "94981229780807", Trail = "Grey"},
-    {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
-    {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
-    {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
-    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
-    {Label = "Jack", ID = "109587843256297", Trail = "Jack"},
-    {Label = "Coco", ID = "104707398257454", Trail = "Coco"},
+    {Label = "Creator", ID = "119439781607263", Trail = "Creator"}, {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
+    {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"}, {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
+    {Label = "Jack", ID = "109587843256297", Trail = "Jack"}, {Label = "Coco", ID = "104707398257454", Trail = "Coco"},
     {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
@@ -145,12 +142,9 @@ local VOID_TEXTURES = {
     {Label = "Pink", ID = "116484869596442", Trail = "VoidPink"}, {Label = "Blue", ID = "70445488766534", Trail = "VoidBlue"},
     {Label = "Halloween", ID = "98602677050830", Trail = "VoidOrange"}, {Label = "Rainbow", ID = "102290178861090", Trail = "Rainbow"},
     {Label = "Grey", ID = "115785353403149", Trail = "Grey"},
-    {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
-    {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
-    {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
-    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
-    {Label = "Jack", ID = "109587843256297", Trail = "Jack"},
-    {Label = "Coco", ID = "104707398257454", Trail = "Coco"},
+    {Label = "Creator", ID = "119439781607263", Trail = "Creator"}, {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"},
+    {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"}, {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"},
+    {Label = "Jack", ID = "109587843256297", Trail = "Jack"}, {Label = "Coco", ID = "104707398257454", Trail = "Coco"},
     {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
@@ -181,6 +175,14 @@ local function isNearOrMine(obj)
     local pos
     if obj:IsA("BasePart") then
         pos = obj.Position
+    elseif obj:IsA("Beam") or obj:IsA("Trail") then
+        local a0 = obj.Attachment0
+        local a1 = obj.Attachment1
+        if a0 and (a0.WorldPosition - hrp.Position).Magnitude <= MAX_BEAM_DISTANCE then return true end
+        if a1 and (a1.WorldPosition - hrp.Position).Magnitude <= MAX_BEAM_DISTANCE then return true end
+        if obj.Parent and obj.Parent:IsA("BasePart") then
+            pos = obj.Parent.Position
+        end
     elseif obj:IsA("Attachment") and obj.Parent and obj.Parent:IsA("BasePart") then
         pos = obj.WorldPosition
     elseif obj:IsA("Decal") or obj:IsA("Texture") then
@@ -312,8 +314,6 @@ for _, info in ipairs(OLD_TEXTURES) do
     end)
 end
 
-local GLOW_ASSET_ID = "rbxassetid://1885993498"
-
 local function getActiveTrail()
     if states.MatrixScope then
         return selectedTrailColorMatrix, selectedTrailRainbowMatrix
@@ -352,15 +352,15 @@ local function drawNeonLaser(origin, endPos)
         seg.CFrame = CFrame.lookAt(a, b) * CFrame.new(0, 0, -segLen / 2)
         seg.Transparency = 1
         seg.Color = activeColor or Color3.new(1, 1, 1)
+        seg.Parent = Workspace
         
         for _, face in ipairs({Enum.NormalId.Front, Enum.NormalId.Back, Enum.NormalId.Top, Enum.NormalId.Bottom, Enum.NormalId.Left, Enum.NormalId.Right}) do
             local tex = Instance.new("Texture")
-            tex.Texture = GLOW_ASSET_ID
+            tex.Texture = "rbxassetid://1885993498"
             tex.Face = face
             tex.Parent = seg
         end
-        
-        seg.Parent = Workspace
+
         table.insert(segments, {Part = seg, Index = i, Length = segLen})
     end
 
@@ -437,15 +437,6 @@ local function isKnifeObj(obj)
     return false
 end
 
-local function isInsideTool(obj)
-    local c = obj.Parent
-    while c and c ~= game do
-        if c:IsA("Tool") then return true end
-        c = c.Parent
-    end
-    return false
-end
-
 local function getBeamEndpoints(beam)
     local a0 = beam.Attachment0
     local a1 = beam.Attachment1
@@ -472,12 +463,14 @@ end
 local function replaceBeamWithLaser(beam)
     if not beam or not beam.Parent then return end
     if not looksLikeShotBeam(beam) then return end
+
     if not (states.MatrixScope or states.VoidScope) then return end
-    
-    if not isNearOrMine(beam) then return end
-    
+
+    -- Ignorar cuchillos
     if isKnifeObj(beam) then return end
-    if isInsideTool(beam) then return end
+    
+    -- Detectar si está cerca o es mío
+    if not isNearOrMine(beam) then return end
 
     local origin, endPos = getBeamEndpoints(beam)
     beam:Destroy()
