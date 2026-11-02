@@ -12,19 +12,19 @@ local CUSTOM_FONT
 pcall(function()
     local oldFiles = {
         "bloodyghost.ttf", "bloodyghost.json", "bloodyghost.version",
-        "BloodyGhost.ttf", "BloodyGhost.json", "BloodyGhost.version"
+        "christmassnow.ttf", "christmassnow.json", "christmassnow.version"
     }
     for _, file in ipairs(oldFiles) do
         if isfile(file) then delfile(file) end
     end
 end)
 
-local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Christmas%20Snow%20PERSONAL%20USE%20ONLY!.ttf"
-local FONT_NAME    = "ChristmasSnow"
-local FONT_FILE    = "christmassnow.ttf"
-local FONT_JSON    = "christmassnow.json"
+local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/MerryChristmasFlake.ttf"
+local FONT_NAME    = "MerryChristmasFlake"
+local FONT_FILE    = "MerryChristmasFlake.ttf"
+local FONT_JSON    = "MerryChristmasFlake.json"
 local FONT_VERSION = "1"
-local VERSION_FILE = "christmassnow.version"
+local VERSION_FILE = "MerryChristmasFlake.version"
 
 pcall(function()
     local savedVersion = nil
