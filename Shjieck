@@ -48,7 +48,7 @@ if not Whitelist[playerName] then
 end
 
 -- ?v=3 fuerza a que se actualice la librería
-local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=4"))()
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=5"))()
 
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200); local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190); local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20); local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
 local TRAIL_VOID_CYAN = Color3.fromRGB(130, 235, 255); local TRAIL_VOID_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_VOID_RED = Color3.fromRGB(255, 0, 0); local TRAIL_VOID_YELLOW = Color3.fromRGB(255, 220, 40)
