@@ -8,20 +8,42 @@ local CoreGui = game:GetService("CoreGui")
 local Player = Players.LocalPlayer
 
 local CUSTOM_FONT
+
+local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Christmas%20Snow%20PERSONAL%20USE%20ONLY!.ttf"
+local FONT_NAME    = "ChristmasSnow"
+local FONT_FILE    = "christmassnow.ttf"
+local FONT_JSON    = "christmassnow.json"
+local FONT_VERSION = "1"
+local VERSION_FILE = "christmassnow.version"
+
 pcall(function()
-    local fontUrl = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Christmas%20Snow%20PERSONAL%20USE%20ONLY!.ttf"
-    if not isfile("bloodyghost.ttf") then
-        writefile("bloodyghost.ttf", game:HttpGet(fontUrl))
+    local savedVersion = nil
+    if isfile(VERSION_FILE) then
+        local ok, v = pcall(readfile, VERSION_FILE)
+        if ok then savedVersion = v end
     end
-    writefile("bloodyghost.json", HttpService:JSONEncode({
-        name = "BloodyGhost",
-        faces = {{name="Regular", weight=400, style="normal", assetId=getcustomasset("bloodyghost.ttf")}}
+
+    local needsDownload = (savedVersion ~= FONT_VERSION) or (not isfile(FONT_FILE))
+
+    if needsDownload then
+        writefile(FONT_FILE, game:HttpGet(FONT_URL))
+        writefile(VERSION_FILE, FONT_VERSION)
+        if isfile(FONT_JSON) then pcall(delfile, FONT_JSON) end
+    end
+
+    writefile(FONT_JSON, HttpService:JSONEncode({
+        name  = FONT_NAME,
+        faces = {
+            { name = "Regular", weight = 400, style = "normal",
+              assetId = getcustomasset(FONT_FILE) }
+        }
     }))
-    CUSTOM_FONT = Font.new(getcustomasset("bloodyghost.json"))
+
+    CUSTOM_FONT = Font.new(getcustomasset(FONT_JSON))
 end)
 
-if not CUSTOM_FONT then 
-    CUSTOM_FONT = Font.fromEnum(Enum.Font.GothamBold) 
+if not CUSTOM_FONT then
+    CUSTOM_FONT = Font.fromEnum(Enum.Font.GothamBold)
 end
 
 local function getGuiParent()
