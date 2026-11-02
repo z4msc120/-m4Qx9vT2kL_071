@@ -149,7 +149,7 @@ function Library:CreateWindow(options)
 	tabList.FillDirection = Enum.FillDirection.Horizontal; tabList.Padding = UDim.new(0, 4); tabList.SortOrder = Enum.SortOrder.LayoutOrder; tabList.VerticalAlignment = Enum.VerticalAlignment.Center; tabList.Parent = tabBar
 
 	local contentHolder = Instance.new("Frame")
-	contentHolder.Name = "ContentHolder"; contentHolder.Position = UDim2.fromOffset(14, 85); contentHolder.Size = UDim2.fromOffset(182, 200); contentHolder.BackgroundTransparency = 1; contentHolder.ZIndex = 2; contentHolder.Parent = mainFrame
+	contentHolder.Name = "ContentHolder"; contentHolder.Position = UDim2.fromOffset(14, 85); contentHolder.Size = UDim2.fromOffset(182, 200); contentHolder.BackgroundTransparency = 1; contentHolder.ClipsDescendants = true; contentHolder.ZIndex = 2; contentHolder.Parent = mainFrame
 
 	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 13, PALETTE.OrangeSoft)
 	titleLabel.Name = "Title"
@@ -320,8 +320,16 @@ function Library:CreateWindow(options)
 		indicator.Parent = tabBtn
 		corner(indicator, UDim.new(1, 0))
 
+		local pageContainer = Instance.new("CanvasGroup")
+		pageContainer.Size = UDim2.fromScale(1, 1)
+		pageContainer.BackgroundTransparency = 1
+		pageContainer.GroupTransparency = 1
+		pageContainer.Visible = false
+		pageContainer.ZIndex = 3
+		pageContainer.Parent = contentHolder
+
 		local page = Instance.new("ScrollingFrame")
-		page.Size = UDim2.fromScale(1, 1); page.BackgroundTransparency = 1; page.BorderSizePixel = 0; page.ScrollBarThickness = 3; page.ScrollBarImageColor3 = PALETTE.Orange; page.ScrollBarImageTransparency = 0.3; page.CanvasSize = UDim2.new(0, 0, 0, 0); page.AutomaticCanvasSize = Enum.AutomaticSize.Y; page.Visible = false; page.ZIndex = 3; page.Parent = contentHolder
+		page.Size = UDim2.fromScale(1, 1); page.BackgroundTransparency = 1; page.BorderSizePixel = 0; page.ScrollBarThickness = 2; page.ScrollBarImageColor3 = PALETTE.Orange; page.ScrollBarImageTransparency = 0.5; page.CanvasSize = UDim2.new(0, 0, 0, 0); page.AutomaticCanvasSize = Enum.AutomaticSize.Y; page.ZIndex = 3; page.Parent = pageContainer
 
 		local pageLayout = Instance.new("UIListLayout")
 		pageLayout.Padding = UDim.new(0, 6); pageLayout.SortOrder = Enum.SortOrder.LayoutOrder; pageLayout.Parent = page
@@ -332,11 +340,29 @@ function Library:CreateWindow(options)
 			if ActiveTab == TabAPI then
 				tween(tabBtn, TweenInfo.new(0.2), {TextColor3 = PALETTE.Cream})
 				indicator.Visible = true
-				page.Visible = true
+				
+				pageContainer.Visible = true
+				pageContainer.Position = UDim2.new(0, 15, 0, 0)
+				
+				tween(pageContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+					Position = UDim2.new(0, 0, 0, 0),
+					GroupTransparency = 0
+				})
 			else
 				tween(tabBtn, TweenInfo.new(0.2), {TextColor3 = PALETTE.Muted})
 				indicator.Visible = false
-				page.Visible = false
+				
+				if pageContainer.Visible then
+					local t = tween(pageContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+						Position = UDim2.new(0, -15, 0, 0),
+						GroupTransparency = 1
+					})
+					t.Completed:Connect(function()
+						if ActiveTab ~= TabAPI then
+							pageContainer.Visible = false
+						end
+					end)
+				end
 			end
 		end
 
