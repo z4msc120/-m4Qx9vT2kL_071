@@ -144,11 +144,14 @@ local targets = { MatrixScope = {}, VoidScope = {} }
 local selectedTextureMatrix, selectedTrailColorMatrix, selectedTrailRainbowMatrix = TEXTURES[1].ID, ColorSequence.new(TRAIL_PRESETS[TEXTURES[1].Trail].Color), false
 local selectedTextureVoid, selectedTrailColorVoid, selectedTrailRainbowVoid = VOID_TEXTURES[1].ID, ColorSequence.new(TRAIL_PRESETS[VOID_TEXTURES[1].Trail].Color), false
 
-local MAX_DISTANCE = 15
+local MAX_BEAM_DISTANCE = 15
 local CUSTOM_BEAM_TEXTURE = "rbxassetid://2723616629"
 
-local originalBeamData = setmetatable({}, {__mode = "k"})
-local allBeams = setmetatable({}, {__mode = "k"})
+local LASER_KEYWORDS = {"beam", "laser", "trail", "tracer", "shot", "line", "ray", "disparo", "bala"}
+local KNIFE_KEYWORDS = {"knife", "sword", "blade", "dagger", "cuchillo", "daga", "katana", "sable"}
+
+local activeBeams = {}
+local firingBeams = {}
 
 local function isAnotherPlayer(obj)
     for _, p in ipairs(Players:GetPlayers()) do
@@ -159,11 +162,47 @@ local function isAnotherPlayer(obj)
     return false
 end
 
+local function isKnifeObj(obj)
+	local c = obj
+	while c and c ~= game do
+		if c:IsA("Tool") then
+			local n = string.lower(c.Name)
+			for _, kw in ipairs(KNIFE_KEYWORDS) do
+				if string.find(n, kw, 1, true) then return true end
+			end
+			return false
+		end
+		c = c.Parent
+	end
+	return false
+end
+
+local function isInsideTool(obj)
+	local c = obj.Parent
+	while c and c ~= game do
+		if c:IsA("Tool") then return true end
+		c = c.Parent
+	end
+	return false
+end
+
+local function looksLikeShotBeam(beam)
+	if not beam:IsA("Beam") then return false end
+	local name = string.lower(beam.Name)
+	for _, kw in ipairs(LASER_KEYWORDS) do
+		if string.find(name, kw) then
+			return true
+		end
+	end
+	return false
+end
+
 local function isNearOrMine(obj)
     if isAnotherPlayer(obj) then return false end
     
     if Player.Character and obj:IsDescendantOf(Player.Character) then return true end
     if Player:FindFirstChild("Backpack") and obj:IsDescendantOf(Player:FindFirstChild("Backpack")) then return true end
+    if obj:IsDescendantOf(ReplicatedStorage) then return true end
 
     local char = Player.Character
     if not char then return false end
@@ -175,16 +214,12 @@ local function isNearOrMine(obj)
         pos = obj.Position
     elseif obj:IsA("Beam") or obj:IsA("Trail") then
         local a0 = obj.Attachment0
-        if a0 and a0.Parent and a0.Parent:IsA("BasePart") then
-            pos = a0.WorldPosition
-        elseif obj.Parent and obj.Parent:IsA("BasePart") then
-            pos = obj.Parent.Position
-        end
+        if a0 then pos = a0.WorldPosition end
     elseif obj:IsA("Attachment") and obj.Parent and obj.Parent:IsA("BasePart") then
         pos = obj.WorldPosition
     end
 
-    if pos and (pos - hrp.Position).Magnitude <= MAX_DISTANCE then
+    if pos and (pos - hrp.Position).Magnitude <= MAX_BEAM_DISTANCE then
         return true
     end
     return false
@@ -257,29 +292,6 @@ local function apply(scope)
     end
 end
 
-local function getActiveTrail()
-    if states.MatrixScope then
-        if selectedTrailRainbowMatrix then return nil, true end
-        local col = selectedTrailColorMatrix
-        if typeof(col) ~= "ColorSequence" then col = ColorSequence.new(TRAIL_PURPLE) end
-        return col, false
-    elseif states.VoidScope then
-        if selectedTrailRainbowVoid then return nil, true end
-        local col = selectedTrailColorVoid
-        if typeof(col) ~= "ColorSequence" then col = ColorSequence.new(TRAIL_VOID_CYAN) end
-        return col, false
-    end
-    return nil, false
-end
-
-local function getBeamColor()
-    local col, rainbow = getActiveTrail()
-    if rainbow then
-        return ColorSequence.new(Color3.fromHSV((tick() * 2) % 1, 1, 1))
-    end
-    return col or ColorSequence.new(Color3.fromRGB(255, 255, 255))
-end
-
 local Window = UILibrary:CreateWindow({Name = "MatrixAndVoidRecolor", Title = "Matrix And Void Recolor", Watermark = "made by samlpzx - sammxqpzw on TikTok\ninsp: kudo"})
 
 Window:AddToggle("MatrixScope", function(state)
@@ -344,46 +356,167 @@ for _, info in ipairs(OLD_TEXTURES) do
     end)
 end
 
-local function processBeam(beam)
-    if not beam or not beam.Parent then return end
-    
-    local isActive = states.MatrixScope or states.VoidScope
-    local isMineOrClose = isNearOrMine(beam)
-    
-    if not isActive or not isMineOrClose then
-        if originalBeamData[beam] then
-            beam.Width0 = originalBeamData[beam].Width0
-            beam.Width1 = originalBeamData[beam].Width1
-            beam.Texture = originalBeamData[beam].Texture
-            beam.Color = originalBeamData[beam].Color
-            beam.LightEmission = originalBeamData[beam].LightEmission
-            beam.LightInfluence = originalBeamData[beam].LightInfluence
-            originalBeamData[beam] = nil
-        end
-        return
+local function getActiveTrail()
+    if states.MatrixScope then
+        if selectedTrailRainbowMatrix then return nil, true end
+        local col = selectedTrailColorMatrix
+        if typeof(col) ~= "ColorSequence" then col = ColorSequence.new(TRAIL_PURPLE) end
+        return col, false
+    elseif states.VoidScope then
+        if selectedTrailRainbowVoid then return nil, true end
+        local col = selectedTrailColorVoid
+        if typeof(col) ~= "ColorSequence" then col = ColorSequence.new(TRAIL_VOID_CYAN) end
+        return col, false
     end
-    
-    if not originalBeamData[beam] then
-        originalBeamData[beam] = {
-            Width0 = beam.Width0,
-            Width1 = beam.Width1,
-            Texture = beam.Texture,
-            Color = beam.Color,
-            LightEmission = beam.LightEmission,
-            LightInfluence = beam.LightInfluence
-        }
-    end
-    
-    beam.Width0 = 0.15
-    beam.Width1 = 0.15
-    beam.Texture = CUSTOM_BEAM_TEXTURE
-    beam.LightEmission = 1
-    beam.LightInfluence = 0
-    beam.Color = getBeamColor()
+    return nil, false
 end
 
-local function setupBeam(beam)
-    allBeams[beam] = true
+local function createCustomBeamLayer(parent, attachment0, attachment1, settings)
+	local beam = Instance.new("Beam")
+	beam.Name = settings.Name or "BeamLayer"
+	beam.Attachment0 = attachment0
+	beam.Attachment1 = attachment1
+	beam.FaceCamera = true
+	beam.LightEmission = 1
+	beam.LightInfluence = 0
+	beam.Width0 = settings.Width
+	beam.Width1 = settings.Width
+	beam.Texture = CUSTOM_BEAM_TEXTURE
+	beam.TextureMode = Enum.TextureMode.Wrap
+	beam.TextureLength = settings.TextureLength or 2
+	beam.TextureSpeed = settings.TextureSpeed or 4
+	beam.Color = settings.Color
+	beam.Transparency = NumberSequence.new(settings.Transparency)
+	beam.Segments = 12
+	beam.ZOffset = settings.ZOffset or 0
+	beam.Parent = parent
+	return beam
+end
+
+local function drawCustomBeam(origin, endPos, origBeam)
+	local distance = (endPos - origin).Magnitude
+	if distance < 0.1 then return end
+
+	local activeColorSeq, activeRainbow = getActiveTrail()
+	if not activeColorSeq and not activeRainbow then return end
+
+	local beamColor
+	if activeRainbow then
+		beamColor = ColorSequence.new(Color3.fromHSV((tick() * 5) % 1, 1, 1))
+	elseif typeof(activeColorSeq) == "ColorSequence" then
+		beamColor = activeColorSeq
+	else
+		beamColor = ColorSequence.new(activeColorSeq)
+	end
+
+	local customBeam = Instance.new("Folder")
+	customBeam.Name = "CustomBeam"
+	customBeam.Parent = Workspace.Terrain
+
+	local attachment0 = Instance.new("Attachment")
+	attachment0.Name = "CustomBeamStart"
+	attachment0.WorldPosition = origin
+	attachment0.Parent = Workspace.Terrain
+
+	local attachment1 = Instance.new("Attachment")
+	attachment1.Name = "CustomBeamEnd"
+	attachment1.WorldPosition = endPos
+	attachment1.Parent = Workspace.Terrain
+
+	local outerGlow = createCustomBeamLayer(customBeam, attachment0, attachment1, {
+		Name = "OuterGlow", Width = 0.25, Transparency = 0.85, Color = beamColor, TextureLength = 2.5, TextureSpeed = 3, ZOffset = -0.03
+	})
+	local middleGlow = createCustomBeamLayer(customBeam, attachment0, attachment1, {
+		Name = "MiddleGlow", Width = 0.12, Transparency = 0.50, Color = beamColor, TextureLength = 2, TextureSpeed = 4, ZOffset = -0.01
+	})
+	local core = createCustomBeamLayer(customBeam, attachment0, attachment1, {
+		Name = "Core", Width = 0.05, Transparency = 0, Color = beamColor, TextureLength = 1.5, TextureSpeed = 5, ZOffset = 0
+	})
+
+	table.insert(activeBeams, {
+		Folder = customBeam,
+		Attach0 = attachment0,
+		Attach1 = attachment1,
+		Outer = outerGlow,
+		Middle = middleGlow,
+		Core = core,
+		StartTime = tick(),
+		IsRainbow = activeRainbow
+	})
+end
+
+RunService.Heartbeat:Connect(function()
+	local now = tick()
+	for i = #activeBeams, 1, -1 do
+		local data = activeBeams[i]
+		local elapsed = now - data.StartTime
+		local fadeT = math.clamp((elapsed - 0.025) / 0.15, 0, 1)
+		local shrink = 1 - fadeT * 0.6
+
+		if data.Outer and data.Outer.Parent then
+			data.Outer.Transparency = NumberSequence.new(0.85 + (fadeT * 0.15))
+			data.Outer.Width0 = 0.25 * shrink
+			data.Outer.Width1 = 0.25 * shrink
+		end
+		if data.Middle and data.Middle.Parent then
+			data.Middle.Transparency = NumberSequence.new(0.50 + (fadeT * 0.50))
+			data.Middle.Width0 = 0.12 * shrink
+			data.Middle.Width1 = 0.12 * shrink
+		end
+		if data.Core and data.Core.Parent then
+			data.Core.Transparency = NumberSequence.new(fadeT)
+			data.Core.Width0 = 0.05 * shrink
+			data.Core.Width1 = 0.05 * shrink
+		end
+
+		if data.IsRainbow then
+			local rainbowColor = ColorSequence.new(Color3.fromHSV((now * 5) % 1, 1, 1))
+			if data.Outer and data.Outer.Parent then data.Outer.Color = rainbowColor end
+			if data.Middle and data.Middle.Parent then data.Middle.Color = rainbowColor end
+			if data.Core and data.Core.Parent then data.Core.Color = rainbowColor end
+		end
+
+		if fadeT >= 1 then
+			if data.Folder then data.Folder:Destroy() end
+			if data.Attach0 then data.Attach0:Destroy() end
+			if data.Attach1 then data.Attach1:Destroy() end
+			table.remove(activeBeams, i)
+		end
+	end
+end)
+
+local function getBeamEndpoints(beam)
+    local a0 = beam.Attachment0
+    local a1 = beam.Attachment1
+    if a0 and a1 then return a0.WorldPosition, a1.WorldPosition end
+    if beam.Parent and beam.Parent:IsA("BasePart") then
+        local pos = beam.Parent.Position
+        return pos, pos + (beam.Parent.CFrame.LookVector * 100)
+    end
+    return nil, nil
+end
+
+local function handleBeamShoot(beam)
+    if not (states.MatrixScope or states.VoidScope) then return end
+    if not isNearOrMine(beam) then return end
+    if not looksLikeShotBeam(beam) then return end
+    if isKnifeObj(beam) then return end
+    if isInsideTool(beam) then return end
+
+    local origin, endPos = getBeamEndpoints(beam)
+    if not origin or not endPos then return end
+
+    local dist = (origin - endPos).Magnitude
+    if dist > 2 and not firingBeams[beam] then
+        firingBeams[beam] = true
+        pcall(function()
+            beam.Transparency = NumberSequence.new(1)
+        end)
+        drawCustomBeam(origin, endPos, beam)
+        task.delay(0.15, function()
+            firingBeams[beam] = nil
+        end)
+    end
 end
 
 task.spawn(function()
@@ -391,10 +524,7 @@ task.spawn(function()
         for _, obj in ipairs(ReplicatedStorage:GetDescendants()) do register(obj) end
     end)
     pcall(function()
-        for _, obj in ipairs(Workspace:GetDescendants()) do
-            register(obj)
-            if obj:IsA("Beam") then setupBeam(obj) end
-        end
+        for _, obj in ipairs(Workspace:GetDescendants()) do register(obj) end
     end)
 
     ReplicatedStorage.DescendantAdded:Connect(function(obj)
@@ -407,7 +537,12 @@ task.spawn(function()
     
     Workspace.DescendantAdded:Connect(function(obj)
         if obj:IsA("Beam") then
-            setupBeam(obj)
+            obj:GetPropertyChangedSignal("Enabled"):Connect(function()
+                handleBeamShoot(obj)
+            end)
+            obj:GetPropertyChangedSignal("Width0"):Connect(function()
+                handleBeamShoot(obj)
+            end)
         else
             task.defer(function()
                 register(obj)
@@ -418,18 +553,16 @@ task.spawn(function()
     end)
 end)
 
-RunService.Heartbeat:Connect(function()
-    if not (states.MatrixScope or states.VoidScope) and next(originalBeamData) == nil then return end
-    
-    for beam in pairs(allBeams) do
-        if beam.Parent then
-            pcall(processBeam, beam)
-        else
-            allBeams[beam] = nil
-            originalBeamData[beam] = nil
-        end
+for _, obj in ipairs(Workspace:GetDescendants()) do
+    if obj:IsA("Beam") then
+        obj:GetPropertyChangedSignal("Enabled"):Connect(function()
+            handleBeamShoot(obj)
+        end)
+        obj:GetPropertyChangedSignal("Width0"):Connect(function()
+            handleBeamShoot(obj)
+        end)
     end
-end)
+end
 
 task.spawn(function()
     while task.wait(0.5) do
