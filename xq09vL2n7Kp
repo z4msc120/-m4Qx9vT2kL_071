@@ -151,11 +151,26 @@ function Library:CreateWindow(options)
 	local contentHolder = Instance.new("Frame")
 	contentHolder.Name = "ContentHolder"; contentHolder.Position = UDim2.fromOffset(14, 74); contentHolder.Size = UDim2.fromOffset(182, 210); contentHolder.BackgroundTransparency = 1; contentHolder.ZIndex = 2; contentHolder.Parent = mainFrame
 
-	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 14, PALETTE.OrangeSoft)
-	titleLabel.Name = "Title"; titleLabel.Position = UDim2.fromOffset(16, 298); titleLabel.Size = UDim2.fromOffset(112, 18); titleLabel.TextTruncate = Enum.TextTruncate.AtEnd; titleLabel.TextStrokeTransparency = 0.5; titleLabel.TextStrokeColor3 = Color3.fromRGB(20, 8, 34); titleLabel.ZIndex = 3
+	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 13, PALETTE.OrangeSoft)
+	titleLabel.Name = "Title"
+	titleLabel.Position = UDim2.fromOffset(16, 302)
+	titleLabel.Size = UDim2.new(1, -32, 0, 16)
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+	titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	titleLabel.TextStrokeTransparency = 0.8
+	titleLabel.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+	titleLabel.ZIndex = 3
 
-	local watermark = makeLabel(mainFrame, options.Watermark or "", 11, PALETTE.Muted)
-	watermark.Name = "Watermark"; watermark.Position = UDim2.fromOffset(16, 318); watermark.Size = UDim2.fromOffset(112, 26); watermark.TextWrapped = true; watermark.TextYAlignment = Enum.TextYAlignment.Top; watermark.TextStrokeTransparency = 0.6; watermark.TextStrokeColor3 = Color3.fromRGB(20, 8, 34); watermark.ZIndex = 3
+	local watermark = makeLabel(mainFrame, options.Watermark or "", 9, PALETTE.Muted)
+	watermark.Name = "Watermark"
+	watermark.Position = UDim2.new(0, 16, 1, -28)
+	watermark.Size = UDim2.new(1, -32, 0, 18)
+	watermark.TextXAlignment = Enum.TextXAlignment.Center
+	watermark.TextWrapped = true
+	watermark.TextYAlignment = Enum.TextYAlignment.Top
+	watermark.TextStrokeTransparency = 0.9
+	watermark.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+	watermark.ZIndex = 3
 
 	local bubble = Instance.new("TextButton")
 	bubble.Name = "MiniButton"; bubble.AnchorPoint = Vector2.new(0.5, 0.5); bubble.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE); bubble.Position = CENTER; bubble.BackgroundColor3 = PALETTE.Panel; bubble.Text = "M"; bubble.TextColor3 = PALETTE.OrangeSoft; bubble.TextSize = 20; bubble.FontFace = CUSTOM_FONT; bubble.AutoButtonColor = false; bubble.BorderSizePixel = 0; bubble.Active = true; bubble.Visible = false; bubble.ZIndex = 20; bubble.Parent = screenGui
