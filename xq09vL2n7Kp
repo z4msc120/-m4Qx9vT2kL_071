@@ -9,6 +9,23 @@ local Player = Players.LocalPlayer
 
 local CUSTOM_FONT
 
+pcall(function()
+    local oldFiles = {
+        "bloodyghost.ttf",
+        "bloodyghost.json",
+        "bloodyghost.version",
+        "BloodyGhost.ttf",
+        "BloodyGhost.json",
+        "BloodyGhost.version"
+    }
+    
+    for _, file in ipairs(oldFiles) do
+        if isfile(file) then
+            delfile(file)
+        end
+    end
+end)
+
 local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Christmas%20Snow%20PERSONAL%20USE%20ONLY!.ttf"
 local FONT_NAME    = "ChristmasSnow"
 local FONT_FILE    = "christmassnow.ttf"
@@ -64,15 +81,15 @@ local BUBBLE_SIZE = 46
 local CENTER = UDim2.new(0.5, 0, 0.5, 0)
 
 local PALETTE = {
-	PanelDark  = Color3.fromRGB(30, 14, 46),
-	Panel      = Color3.fromRGB(62, 34, 94),
-	PanelLight = Color3.fromRGB(92, 56, 136),
-	Stroke     = Color3.fromRGB(150, 104, 205),
-	TrackOff   = Color3.fromRGB(88, 62, 120),
-	Orange     = Color3.fromRGB(255, 146, 46),
-	OrangeSoft = Color3.fromRGB(255, 190, 112),
-	Cream      = Color3.fromRGB(255, 238, 214),
-	Muted      = Color3.fromRGB(190, 165, 220),
+	PanelDark  = Color3.fromRGB(60, 10, 15),    
+	Panel      = Color3.fromRGB(100, 15, 20),   
+	PanelLight = Color3.fromRGB(140, 25, 30),   
+	Stroke     = Color3.fromRGB(220, 180, 100), 
+	TrackOff   = Color3.fromRGB(140, 50, 50),   
+	Orange     = Color3.fromRGB(40, 160, 70),   
+	OrangeSoft = Color3.fromRGB(100, 220, 130), 
+	Cream      = Color3.fromRGB(255, 255, 255), 
+	Muted      = Color3.fromRGB(200, 180, 180), 
 }
 
 local function corner(parent, radius)
@@ -198,7 +215,7 @@ function Library:CreateWindow(options)
 	scroll.BackgroundTransparency = 1
 	scroll.BorderSizePixel = 0
 	scroll.ScrollBarThickness = 3
-	scroll.ScrollBarImageColor3 = PALETTE.Orange
+	scroll.ScrollBarImageColor3 = PALETTE.Orange 
 	scroll.ScrollBarImageTransparency = 0.3
 	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -242,7 +259,7 @@ function Library:CreateWindow(options)
 	bubble.Position = CENTER
 	bubble.BackgroundColor3 = PALETTE.Panel
 	bubble.Text = "M"
-	bubble.TextColor3 = PALETTE.Orange
+	bubble.TextColor3 = PALETTE.OrangeSoft
 	bubble.TextSize = 20
 	bubble.FontFace = CUSTOM_FONT
 	bubble.AutoButtonColor = false
@@ -458,7 +475,7 @@ function Library:CreateWindow(options)
 			tween(track, info, {BackgroundColor3 = state and PALETTE.Orange or PALETTE.TrackOff})
 			tween(knob, info, {Position = state and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
 			tween(rowStroke, info, {Color = state and PALETTE.Orange or PALETTE.Stroke, Transparency = state and 0.15 or 0.6})
-			tween(label, info, {TextColor3 = state and Color3.fromRGB(255, 255, 255) or PALETTE.Cream})
+			tween(label, info, {TextColor3 = state and PALETTE.Cream or PALETTE.Cream})
 		end
 
 		local hover = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
@@ -497,7 +514,7 @@ function Library:CreateWindow(options)
 		holder.Parent = content
 		self.LayoutOrder = self.LayoutOrder + 1
 
-		local l = makeLabel(holder, text, 12, PALETTE.Orange)
+		local l = makeLabel(holder, text, 12, PALETTE.OrangeSoft)
 		l.Size = UDim2.new(1, 0, 0, 18)
 		l.Position = UDim2.fromOffset(2, 0)
 		l.TextStrokeTransparency = 0.6
