@@ -208,30 +208,32 @@ function Library:CreateWindow(options)
 	local minimizeBtn = makeHitButton("MinimizeHit", 167, 20.5, 22)
 	local closeBtn = makeHitButton("CloseHit", 191.5, 20.5, 22)
 
-	local scroll = Instance.new("ScrollingFrame")
-	scroll.Name = "Scroll"
-	scroll.Position = UDim2.fromOffset(14, 42)
-	scroll.Size = UDim2.fromOffset(182, 244)
-	scroll.BackgroundTransparency = 1
-	scroll.BorderSizePixel = 0
-	scroll.ScrollBarThickness = 3
-	scroll.ScrollBarImageColor3 = PALETTE.Orange 
-	scroll.ScrollBarImageTransparency = 0.3
-	scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	scroll.ZIndex = 2
-	scroll.Parent = mainFrame
+	local tabBar = Instance.new("ScrollingFrame")
+	tabBar.Name = "TabBar"
+	tabBar.Position = UDim2.fromOffset(14, 42)
+	tabBar.Size = UDim2.fromOffset(182, 26)
+	tabBar.BackgroundTransparency = 1
+	tabBar.BorderSizePixel = 0
+	tabBar.ScrollBarThickness = 0
+	tabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
+	tabBar.AutomaticCanvasSize = Enum.AutomaticSize.X
+	tabBar.ScrollingDirection = Enum.ScrollingDirection.X
+	tabBar.ZIndex = 2
+	tabBar.Parent = mainFrame
 
-	local content = Instance.new("Frame")
-	content.Size = UDim2.new(1, -8, 0, 0)
-	content.AutomaticSize = Enum.AutomaticSize.Y
-	content.BackgroundTransparency = 1
-	content.Parent = scroll
+	local tabList = Instance.new("UIListLayout")
+	tabList.FillDirection = Enum.FillDirection.Horizontal
+	tabList.Padding = UDim.new(0, 4)
+	tabList.SortOrder = Enum.SortOrder.LayoutOrder
+	tabList.Parent = tabBar
 
-	local contentLayout = Instance.new("UIListLayout")
-	contentLayout.Padding = UDim.new(0, 6)
-	contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	contentLayout.Parent = content
+	local contentHolder = Instance.new("Frame")
+	contentHolder.Name = "ContentHolder"
+	contentHolder.Position = UDim2.fromOffset(14, 74)
+	contentHolder.Size = UDim2.fromOffset(182, 210)
+	contentHolder.BackgroundTransparency = 1
+	contentHolder.ZIndex = 2
+	contentHolder.Parent = mainFrame
 
 	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 14, PALETTE.OrangeSoft)
 	titleLabel.Name = "Title"
@@ -431,132 +433,147 @@ function Library:CreateWindow(options)
 		end)
 	end
 
-	local WindowAPI = { LayoutOrder = 1 }
+	local WindowAPI = { TabCount = 1 }
+	local Tabs = {}
+	local ActiveTab = nil
 
-	function WindowAPI:AddToggle(text, callback)
-		local row = Instance.new("TextButton")
-		row.Size = UDim2.new(1, 0, 0, 30)
-		row.BackgroundColor3 = PALETTE.Panel
-		row.BackgroundTransparency = 0.2
-		row.Text = ""
-		row.AutoButtonColor = false
-		row.BorderSizePixel = 0
-		row.LayoutOrder = self.LayoutOrder
-		row.Parent = content
-		self.LayoutOrder = self.LayoutOrder + 1
-		corner(row, UDim.new(0, 9))
-		local rowStroke = stroke(row, PALETTE.Stroke, 1, 0.6)
+	function WindowAPI:AddTab(tabName)
+		local tabBtn = Instance.new("TextButton")
+		tabBtn.Size = UDim2.new(0, 0, 1, 0)
+		tabBtn.AutomaticSize = Enum.AutomaticSize.X
+		tabBtn.BackgroundColor3 = PALETTE.Panel
+		tabBtn.Text = "  " .. tabName .. "  "
+		tabBtn.TextColor3 = PALETTE.Cream
+		tabBtn.FontFace = CUSTOM_FONT
+		tabBtn.TextSize = 12
+		tabBtn.AutoButtonColor = false
+		tabBtn.BorderSizePixel = 0
+		tabBtn.LayoutOrder = self.TabCount
+		tabBtn.Parent = tabBar
+		self.TabCount = self.TabCount + 1
+		corner(tabBtn, UDim.new(0, 6))
+		local btnStroke = stroke(tabBtn, PALETTE.Stroke, 1, 0.6)
 
-		local label = makeLabel(row, text, 13, PALETTE.Cream)
-		label.Position = UDim2.fromOffset(10, 0)
-		label.Size = UDim2.new(1, -58, 1, 0)
-		label.TextTruncate = Enum.TextTruncate.AtEnd
+		local page = Instance.new("ScrollingFrame")
+		page.Size = UDim2.fromScale(1, 1)
+		page.BackgroundTransparency = 1
+		page.BorderSizePixel = 0
+		page.ScrollBarThickness = 3
+		page.ScrollBarImageColor3 = PALETTE.Orange
+		page.ScrollBarImageTransparency = 0.3
+		page.CanvasSize = UDim2.new(0, 0, 0, 0)
+		page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		page.Visible = false
+		page.Parent = contentHolder
 
-		local track = Instance.new("Frame")
-		track.Size = UDim2.fromOffset(30, 16)
-		track.Position = UDim2.new(1, -40, 0.5, -8)
-		track.BackgroundColor3 = PALETTE.TrackOff
-		track.BorderSizePixel = 0
-		track.Parent = row
-		corner(track, UDim.new(1, 0))
+		local pageLayout = Instance.new("UIListLayout")
+		pageLayout.Padding = UDim.new(0, 6)
+		pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		pageLayout.Parent = page
 
-		local knob = Instance.new("Frame")
-		knob.Size = UDim2.fromOffset(12, 12)
-		knob.Position = UDim2.new(0, 2, 0.5, -6)
-		knob.BackgroundColor3 = PALETTE.Cream
-		knob.BorderSizePixel = 0
-		knob.Parent = track
-		corner(knob, UDim.new(1, 0))
-
-		local state = false
-		local info = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-
-		local function render()
-			tween(track, info, {BackgroundColor3 = state and PALETTE.Orange or PALETTE.TrackOff})
-			tween(knob, info, {Position = state and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
-			tween(rowStroke, info, {Color = state and PALETTE.Orange or PALETTE.Stroke, Transparency = state and 0.15 or 0.6})
-			tween(label, info, {TextColor3 = state and PALETTE.Cream or PALETTE.Cream})
+		local TabAPI = { LayoutOrder = 1 }
+		
+		local function renderTab()
+			if ActiveTab == TabAPI then
+				tween(tabBtn, TweenInfo.new(0.2), {BackgroundColor3 = PALETTE.Orange, TextColor3 = Color3.fromRGB(255,255,255)})
+				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Orange, Transparency = 0.2})
+				page.Visible = true
+			else
+				tween(tabBtn, TweenInfo.new(0.2), {BackgroundColor3 = PALETTE.Panel, TextColor3 = PALETTE.Muted})
+				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Stroke, Transparency = 0.6})
+				page.Visible = false
+			end
 		end
 
-		local hover = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		row.MouseEnter:Connect(function() tween(row, hover, {BackgroundTransparency = 0.05}) end)
-		row.MouseLeave:Connect(function() tween(row, hover, {BackgroundTransparency = 0.2}) end)
-
-		local function fire()
-			if not callback then return end
-			local ok, err = pcall(callback, state)
-			if not ok then warn("[" .. name .. "] error en '" .. tostring(text) .. "':", err) end
-		end
-
-		row.MouseButton1Click:Connect(function()
-			state = not state
-			render()
-			fire()
+		tabBtn.MouseButton1Click:Connect(function()
+			ActiveTab = TabAPI
+			for _, t in pairs(Tabs) do
+				t.Render()
+			end
 		end)
 
-		return {
-			Set = function(_, v)
-				v = v and true or false
-				if v == state then return end
-				state = v
+		TabAPI.Render = renderTab
+		table.insert(Tabs, TabAPI)
+
+		if not ActiveTab then
+			ActiveTab = TabAPI
+		end
+		renderTab()
+
+		function TabAPI:AddToggle(text, callback)
+			local row = Instance.new("TextButton")
+			row.Size = UDim2.new(1, 0, 0, 30)
+			row.BackgroundColor3 = PALETTE.Panel
+			row.BackgroundTransparency = 0.2
+			row.Text = ""
+			row.AutoButtonColor = false
+			row.BorderSizePixel = 0
+			row.LayoutOrder = self.LayoutOrder
+			row.Parent = page
+			self.LayoutOrder = self.LayoutOrder + 1
+			corner(row, UDim.new(0, 9))
+			local rowStroke = stroke(row, PALETTE.Stroke, 1, 0.6)
+
+			local label = makeLabel(row, text, 13, PALETTE.Cream)
+			label.Position = UDim2.fromOffset(10, 0)
+			label.Size = UDim2.new(1, -58, 1, 0)
+			label.TextTruncate = Enum.TextTruncate.AtEnd
+
+			local track = Instance.new("Frame")
+			track.Size = UDim2.fromOffset(30, 16)
+			track.Position = UDim2.new(1, -40, 0.5, -8)
+			track.BackgroundColor3 = PALETTE.TrackOff
+			track.BorderSizePixel = 0
+			track.Parent = row
+			corner(track, UDim.new(1, 0))
+
+			local knob = Instance.new("Frame")
+			knob.Size = UDim2.fromOffset(12, 12)
+			knob.Position = UDim2.new(0, 2, 0.5, -6)
+			knob.BackgroundColor3 = PALETTE.Cream
+			knob.BorderSizePixel = 0
+			knob.Parent = track
+			corner(knob, UDim.new(1, 0))
+
+			local state = false
+			local info = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+			local function render()
+				tween(track, info, {BackgroundColor3 = state and PALETTE.Orange or PALETTE.TrackOff})
+				tween(knob, info, {Position = state and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
+				tween(rowStroke, info, {Color = state and PALETTE.Orange or PALETTE.Stroke, Transparency = state and 0.15 or 0.6})
+				tween(label, info, {TextColor3 = state and PALETTE.Cream or PALETTE.Cream})
+			end
+
+			local hover = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			row.MouseEnter:Connect(function() tween(row, hover, {BackgroundTransparency = 0.05}) end)
+			row.MouseLeave:Connect(function() tween(row, hover, {BackgroundTransparency = 0.2}) end)
+
+			local function fire()
+				if not callback then return end
+				local ok, err = pcall(callback, state)
+				if not ok then warn("[" .. name .. "] error en '" .. tostring(text) .. "':", err) end
+			end
+
+			row.MouseButton1Click:Connect(function()
+				state = not state
 				render()
 				fire()
-			end,
-			Get = function() return state end,
-		}
-	end
+			end)
 
-	function WindowAPI:AddSection(text)
-		local holder = Instance.new("Frame")
-		holder.Size = UDim2.new(1, 0, 0, 22)
-		holder.BackgroundTransparency = 1
-		holder.LayoutOrder = self.LayoutOrder
-		holder.Parent = content
-		self.LayoutOrder = self.LayoutOrder + 1
+			return {
+				Set = function(_, v)
+					v = v and true or false
+					if v == state then return end
+					state = v
+					render()
+					fire()
+				end,
+				Get = function() return state end,
+			}
+		end
 
-		local l = makeLabel(holder, text, 12, PALETTE.OrangeSoft)
-		l.Size = UDim2.new(1, 0, 0, 18)
-		l.Position = UDim2.fromOffset(2, 0)
-		l.TextStrokeTransparency = 0.6
-		l.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
-
-		local line = Instance.new("Frame")
-		line.Size = UDim2.new(1, -4, 0, 1)
-		line.Position = UDim2.new(0, 2, 1, -2)
-		line.BackgroundColor3 = PALETTE.Stroke
-		line.BackgroundTransparency = 0.55
-		line.BorderSizePixel = 0
-		line.Parent = holder
-	end
-
-	function WindowAPI:AddList()
-		local frame = Instance.new("Frame")
-		frame.Size = UDim2.new(1, 0, 0, 0)
-		frame.AutomaticSize = Enum.AutomaticSize.Y
-		frame.BackgroundColor3 = PALETTE.PanelDark
-		frame.BackgroundTransparency = 0.35
-		frame.BorderSizePixel = 0
-		frame.LayoutOrder = self.LayoutOrder
-		frame.Parent = content
-		self.LayoutOrder = self.LayoutOrder + 1
-		corner(frame, UDim.new(0, 10))
-		stroke(frame, PALETTE.Stroke, 1, 0.65)
-
-		local p = Instance.new("UIPadding")
-		p.PaddingTop = UDim.new(0, 6)
-		p.PaddingBottom = UDim.new(0, 6)
-		p.PaddingLeft = UDim.new(0, 6)
-		p.PaddingRight = UDim.new(0, 6)
-		p.Parent = frame
-
-		local l = Instance.new("UIListLayout")
-		l.Padding = UDim.new(0, 5)
-		l.SortOrder = Enum.SortOrder.LayoutOrder
-		l.Parent = frame
-
-		local ListAPI = { Order = 1 }
-
-		function ListAPI:AddButton(text, callback)
+		function TabAPI:AddButton(text, callback)
 			local b = Instance.new("TextButton")
 			b.Size = UDim2.new(1, 0, 0, 28)
 			b.BackgroundColor3 = PALETTE.Panel
@@ -567,9 +584,9 @@ function Library:CreateWindow(options)
 			b.FontFace = CUSTOM_FONT
 			b.AutoButtonColor = false
 			b.BorderSizePixel = 0
-			b.LayoutOrder = self.Order
-			b.Parent = frame
-			self.Order = self.Order + 1
+			b.LayoutOrder = self.LayoutOrder
+			b.Parent = page
+			self.LayoutOrder = self.LayoutOrder + 1
 			corner(b, UDim.new(0, 8))
 			local bStroke = stroke(b, PALETTE.Stroke, 1, 0.65)
 
@@ -601,7 +618,30 @@ function Library:CreateWindow(options)
 			return b
 		end
 
-		return ListAPI
+		function TabAPI:AddSection(text)
+			local holder = Instance.new("Frame")
+			holder.Size = UDim2.new(1, 0, 0, 22)
+			holder.BackgroundTransparency = 1
+			holder.LayoutOrder = self.LayoutOrder
+			holder.Parent = page
+			self.LayoutOrder = self.LayoutOrder + 1
+
+			local l = makeLabel(holder, text, 12, PALETTE.OrangeSoft)
+			l.Size = UDim2.new(1, 0, 0, 18)
+			l.Position = UDim2.fromOffset(2, 0)
+			l.TextStrokeTransparency = 0.6
+			l.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+
+			local line = Instance.new("Frame")
+			line.Size = UDim2.new(1, -4, 0, 1)
+			line.Position = UDim2.new(0, 2, 1, -2)
+			line.BackgroundColor3 = PALETTE.Stroke
+			line.BackgroundTransparency = 0.55
+			line.BorderSizePixel = 0
+			line.Parent = holder
+		end
+
+		return TabAPI
 	end
 
 	function WindowAPI:Destroy() close() end
