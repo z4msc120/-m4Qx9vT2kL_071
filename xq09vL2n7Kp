@@ -9,7 +9,7 @@ local Player = Players.LocalPlayer
 
 local CUSTOM_FONT
 pcall(function()
-    local fontUrl = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/BloodyGhost_PERSONAL_USE_ONLY.ttf"
+    local fontUrl = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Christmas%20Snow%20PERSONAL%20USE%20ONLY!.ttf"
     if not isfile("bloodyghost.ttf") then
         writefile("bloodyghost.ttf", game:HttpGet(fontUrl))
     end
