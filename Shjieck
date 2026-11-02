@@ -496,26 +496,28 @@ local function getBeamEndpoints(beam)
     return nil, nil
 end
 
-local function handleBeamShoot(beam)
+local function processBeam(beam)
     if not (states.MatrixScope or states.VoidScope) then return end
     if not isNearOrMine(beam) then return end
     if not looksLikeShotBeam(beam) then return end
     if isKnifeObj(beam) then return end
-    if isInsideTool(beam) then return end
+
+    if beam.Transparency ~= NumberSequence.new(1) then
+        pcall(function() beam.Transparency = NumberSequence.new(1) end)
+    end
 
     local origin, endPos = getBeamEndpoints(beam)
     if not origin or not endPos then return end
 
     local dist = (origin - endPos).Magnitude
-    if dist > 2 and not firingBeams[beam] then
-        firingBeams[beam] = true
-        pcall(function()
-            beam.Transparency = NumberSequence.new(1)
-        end)
-        drawCustomBeam(origin, endPos, beam)
-        task.delay(0.15, function()
-            firingBeams[beam] = nil
-        end)
+    if dist > 2 and beam.Enabled and (beam.Width0 > 0.01 or beam.Width1 > 0.01) then
+        if not firingBeams[beam] then
+            firingBeams[beam] = true
+            drawCustomBeam(origin, endPos, beam)
+            task.delay(0.15, function()
+                firingBeams[beam] = nil
+            end)
+        end
     end
 end
 
@@ -537,12 +539,10 @@ task.spawn(function()
     
     Workspace.DescendantAdded:Connect(function(obj)
         if obj:IsA("Beam") then
-            obj:GetPropertyChangedSignal("Enabled"):Connect(function()
-                handleBeamShoot(obj)
-            end)
-            obj:GetPropertyChangedSignal("Width0"):Connect(function()
-                handleBeamShoot(obj)
-            end)
+            obj:GetPropertyChangedSignal("Transparency"):Connect(function() processBeam(obj) end)
+            obj:GetPropertyChangedSignal("Enabled"):Connect(function() processBeam(obj) end)
+            obj:GetPropertyChangedSignal("Width0"):Connect(function() processBeam(obj) end)
+            processBeam(obj)
         else
             task.defer(function()
                 register(obj)
@@ -555,12 +555,10 @@ end)
 
 for _, obj in ipairs(Workspace:GetDescendants()) do
     if obj:IsA("Beam") then
-        obj:GetPropertyChangedSignal("Enabled"):Connect(function()
-            handleBeamShoot(obj)
-        end)
-        obj:GetPropertyChangedSignal("Width0"):Connect(function()
-            handleBeamShoot(obj)
-        end)
+        obj:GetPropertyChangedSignal("Transparency"):Connect(function() processBeam(obj) end)
+        obj:GetPropertyChangedSignal("Enabled"):Connect(function() processBeam(obj) end)
+        obj:GetPropertyChangedSignal("Width0"):Connect(function() processBeam(obj) end)
+        processBeam(obj)
     end
 end
 
