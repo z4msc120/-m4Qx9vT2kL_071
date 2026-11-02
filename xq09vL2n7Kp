@@ -36,7 +36,7 @@ local function getGuiParent()
 	return nil
 end
 
-local WINDOW_IMAGE = "rbxassetid://108891211241290"
+local WINDOW_IMAGE = "rbxassetid://123135833887908"
 local WINDOW_W, WINDOW_H = 210, 380
 local BUBBLE_SIZE = 46
 local CENTER = UDim2.new(0.5, 0, 0.5, 0)
