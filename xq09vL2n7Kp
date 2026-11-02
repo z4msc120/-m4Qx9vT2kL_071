@@ -11,18 +11,11 @@ local CUSTOM_FONT
 
 pcall(function()
     local oldFiles = {
-        "bloodyghost.ttf",
-        "bloodyghost.json",
-        "bloodyghost.version",
-        "BloodyGhost.ttf",
-        "BloodyGhost.json",
-        "BloodyGhost.version"
+        "bloodyghost.ttf", "bloodyghost.json", "bloodyghost.version",
+        "BloodyGhost.ttf", "BloodyGhost.json", "BloodyGhost.version"
     }
-    
     for _, file in ipairs(oldFiles) do
-        if isfile(file) then
-            delfile(file)
-        end
+        if isfile(file) then delfile(file) end
     end
 end)
 
@@ -39,29 +32,20 @@ pcall(function()
         local ok, v = pcall(readfile, VERSION_FILE)
         if ok then savedVersion = v end
     end
-
     local needsDownload = (savedVersion ~= FONT_VERSION) or (not isfile(FONT_FILE))
-
     if needsDownload then
         writefile(FONT_FILE, game:HttpGet(FONT_URL))
         writefile(VERSION_FILE, FONT_VERSION)
         if isfile(FONT_JSON) then pcall(delfile, FONT_JSON) end
     end
-
     writefile(FONT_JSON, HttpService:JSONEncode({
         name  = FONT_NAME,
-        faces = {
-            { name = "Regular", weight = 400, style = "normal",
-              assetId = getcustomasset(FONT_FILE) }
-        }
+        faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
     }))
-
     CUSTOM_FONT = Font.new(getcustomasset(FONT_JSON))
 end)
 
-if not CUSTOM_FONT then
-    CUSTOM_FONT = Font.fromEnum(Enum.Font.GothamBold)
-end
+if not CUSTOM_FONT then CUSTOM_FONT = Font.fromEnum(Enum.Font.GothamBold) end
 
 local function getGuiParent()
 	local pg = Player:FindFirstChildOfClass("PlayerGui")
@@ -93,38 +77,21 @@ local PALETTE = {
 }
 
 local function corner(parent, radius)
-	local c = Instance.new("UICorner")
-	c.CornerRadius = radius
-	c.Parent = parent
-	return c
+	local c = Instance.new("UICorner"); c.CornerRadius = radius; c.Parent = parent; return c
 end
 
 local function stroke(parent, color, thickness, transparency)
 	local s = Instance.new("UIStroke")
-	s.Color = color
-	s.Thickness = thickness
-	s.Transparency = transparency
-	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	s.Parent = parent
-	return s
+	s.Color = color; s.Thickness = thickness; s.Transparency = transparency; s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border; s.Parent = parent; return s
 end
 
 local function tween(obj, info, props)
-	local t = TweenService:Create(obj, info, props)
-	t:Play()
-	return t
+	local t = TweenService:Create(obj, info, props); t:Play(); return t
 end
 
 local function makeLabel(parent, text, size, color)
 	local l = Instance.new("TextLabel")
-	l.BackgroundTransparency = 1
-	l.Text = text
-	l.TextColor3 = color
-	l.TextSize = size
-	l.FontFace = CUSTOM_FONT
-	l.TextXAlignment = Enum.TextXAlignment.Left
-	l.Parent = parent
-	return l
+	l.BackgroundTransparency = 1; l.Text = text; l.TextColor3 = color; l.TextSize = size; l.FontFace = CUSTOM_FONT; l.TextXAlignment = Enum.TextXAlignment.Left; l.Parent = parent; return l
 end
 
 function Library:CreateWindow(options)
@@ -140,31 +107,16 @@ function Library:CreateWindow(options)
 
 	local connections = {}
 	local function connect(signal, fn)
-		local c = signal:Connect(fn)
-		table.insert(connections, c)
-		return c
+		local c = signal:Connect(fn); table.insert(connections, c); return c
 	end
 
 	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = name
-	screenGui.ResetOnSpawn = false
-	screenGui.IgnoreGuiInset = true
-	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	screenGui.DisplayOrder = 999999
-	screenGui.Parent = guiParent
+	screenGui.Name = name; screenGui.ResetOnSpawn = false; screenGui.IgnoreGuiInset = true; screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; screenGui.DisplayOrder = 999999; screenGui.Parent = guiParent
 
 	local mainFrame = Instance.new("CanvasGroup")
-	mainFrame.Name = "MainFrame"
-	mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	mainFrame.Size = UDim2.fromOffset(WINDOW_W, WINDOW_H)
-	mainFrame.Position = CENTER
-	mainFrame.BackgroundTransparency = 1
-	mainFrame.BorderSizePixel = 0
-	mainFrame.Active = true
-	mainFrame.Parent = screenGui
+	mainFrame.Name = "MainFrame"; mainFrame.AnchorPoint = Vector2.new(0.5, 0.5); mainFrame.Size = UDim2.fromOffset(WINDOW_W, WINDOW_H); mainFrame.Position = CENTER; mainFrame.BackgroundTransparency = 1; mainFrame.BorderSizePixel = 0; mainFrame.Active = true; mainFrame.Parent = screenGui
 
-	local mainScale = Instance.new("UIScale")
-	mainScale.Parent = mainFrame
+	local mainScale = Instance.new("UIScale"); mainScale.Parent = mainFrame
 
 	local function getBaseScale()
 		local cam = workspace.CurrentCamera
@@ -174,30 +126,12 @@ function Library:CreateWindow(options)
 	local baseScale = getBaseScale()
 
 	local bg = Instance.new("ImageLabel")
-	bg.Name = "Background"
-	bg.Size = UDim2.fromScale(1, 1)
-	bg.BackgroundTransparency = 1
-	bg.Image = WINDOW_IMAGE
-	bg.ScaleType = Enum.ScaleType.Stretch
-	bg.Active = true
-	bg.ZIndex = 1
-	bg.Parent = mainFrame
+	bg.Name = "Background"; bg.Size = UDim2.fromScale(1, 1); bg.BackgroundTransparency = 1; bg.Image = WINDOW_IMAGE; bg.ScaleType = Enum.ScaleType.Stretch; bg.Active = true; bg.ZIndex = 1; bg.Parent = mainFrame
 
 	local function makeHitButton(btnName, cx, cy, size)
 		local b = Instance.new("TextButton")
-		b.Name = btnName
-		b.AnchorPoint = Vector2.new(0.5, 0.5)
-		b.Position = UDim2.fromOffset(cx, cy)
-		b.Size = UDim2.fromOffset(size, size)
-		b.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		b.BackgroundTransparency = 1
-		b.Text = ""
-		b.AutoButtonColor = false
-		b.BorderSizePixel = 0
-		b.ZIndex = 10
-		b.Parent = mainFrame
+		b.Name = btnName; b.AnchorPoint = Vector2.new(0.5, 0.5); b.Position = UDim2.fromOffset(cx, cy); b.Size = UDim2.fromOffset(size, size); b.BackgroundColor3 = Color3.fromRGB(255, 255, 255); b.BackgroundTransparency = 1; b.Text = ""; b.AutoButtonColor = false; b.BorderSizePixel = 0; b.ZIndex = 10; b.Parent = mainFrame
 		corner(b, UDim.new(1, 0))
-
 		local press = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		connect(b.MouseButton1Down, function() tween(b, press, {BackgroundTransparency = 0.7}) end)
 		connect(b.MouseButton1Up, function() tween(b, press, {BackgroundTransparency = 1}) end)
@@ -209,89 +143,30 @@ function Library:CreateWindow(options)
 	local closeBtn = makeHitButton("CloseHit", 191.5, 20.5, 22)
 
 	local tabBar = Instance.new("ScrollingFrame")
-	tabBar.Name = "TabBar"
-	tabBar.Position = UDim2.fromOffset(14, 42)
-	tabBar.Size = UDim2.fromOffset(182, 26)
-	tabBar.BackgroundTransparency = 1
-	tabBar.BorderSizePixel = 0
-	tabBar.ScrollBarThickness = 0
-	tabBar.CanvasSize = UDim2.new(0, 0, 0, 0)
-	tabBar.AutomaticCanvasSize = Enum.AutomaticSize.X
-	tabBar.ScrollingDirection = Enum.ScrollingDirection.X
-	tabBar.ZIndex = 2
-	tabBar.Parent = mainFrame
+	tabBar.Name = "TabBar"; tabBar.Position = UDim2.fromOffset(14, 42); tabBar.Size = UDim2.fromOffset(182, 26); tabBar.BackgroundTransparency = 1; tabBar.BorderSizePixel = 0; tabBar.ScrollBarThickness = 0; tabBar.CanvasSize = UDim2.new(0, 0, 0, 0); tabBar.AutomaticCanvasSize = Enum.AutomaticSize.X; tabBar.ScrollingDirection = Enum.ScrollingDirection.X; tabBar.ZIndex = 2; tabBar.Parent = mainFrame
 
 	local tabList = Instance.new("UIListLayout")
-	tabList.FillDirection = Enum.FillDirection.Horizontal
-	tabList.Padding = UDim.new(0, 4)
-	tabList.SortOrder = Enum.SortOrder.LayoutOrder
-	tabList.Parent = tabBar
+	tabList.FillDirection = Enum.FillDirection.Horizontal; tabList.Padding = UDim.new(0, 4); tabList.SortOrder = Enum.SortOrder.LayoutOrder; tabList.Parent = tabBar
 
 	local contentHolder = Instance.new("Frame")
-	contentHolder.Name = "ContentHolder"
-	contentHolder.Position = UDim2.fromOffset(14, 74)
-	contentHolder.Size = UDim2.fromOffset(182, 210)
-	contentHolder.BackgroundTransparency = 1
-	contentHolder.ZIndex = 2
-	contentHolder.Parent = mainFrame
+	contentHolder.Name = "ContentHolder"; contentHolder.Position = UDim2.fromOffset(14, 74); contentHolder.Size = UDim2.fromOffset(182, 210); contentHolder.BackgroundTransparency = 1; contentHolder.ZIndex = 2; contentHolder.Parent = mainFrame
 
 	local titleLabel = makeLabel(mainFrame, options.Title or "Window", 14, PALETTE.OrangeSoft)
-	titleLabel.Name = "Title"
-	titleLabel.Position = UDim2.fromOffset(16, 298)
-	titleLabel.Size = UDim2.fromOffset(112, 18)
-	titleLabel.TextTruncate = Enum.TextTruncate.AtEnd
-	titleLabel.TextStrokeTransparency = 0.5
-	titleLabel.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
-	titleLabel.ZIndex = 3
+	titleLabel.Name = "Title"; titleLabel.Position = UDim2.fromOffset(16, 298); titleLabel.Size = UDim2.fromOffset(112, 18); titleLabel.TextTruncate = Enum.TextTruncate.AtEnd; titleLabel.TextStrokeTransparency = 0.5; titleLabel.TextStrokeColor3 = Color3.fromRGB(20, 8, 34); titleLabel.ZIndex = 3
 
 	local watermark = makeLabel(mainFrame, options.Watermark or "", 11, PALETTE.Muted)
-	watermark.Name = "Watermark"
-	watermark.Position = UDim2.fromOffset(16, 318)
-	watermark.Size = UDim2.fromOffset(112, 26)
-	watermark.TextWrapped = true
-	watermark.TextYAlignment = Enum.TextYAlignment.Top
-	watermark.TextStrokeTransparency = 0.6
-	watermark.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
-	watermark.ZIndex = 3
+	watermark.Name = "Watermark"; watermark.Position = UDim2.fromOffset(16, 318); watermark.Size = UDim2.fromOffset(112, 26); watermark.TextWrapped = true; watermark.TextYAlignment = Enum.TextYAlignment.Top; watermark.TextStrokeTransparency = 0.6; watermark.TextStrokeColor3 = Color3.fromRGB(20, 8, 34); watermark.ZIndex = 3
 
 	local bubble = Instance.new("TextButton")
-	bubble.Name = "MiniButton"
-	bubble.AnchorPoint = Vector2.new(0.5, 0.5)
-	bubble.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE)
-	bubble.Position = CENTER
-	bubble.BackgroundColor3 = PALETTE.Panel
-	bubble.Text = "M"
-	bubble.TextColor3 = PALETTE.OrangeSoft
-	bubble.TextSize = 20
-	bubble.FontFace = CUSTOM_FONT
-	bubble.AutoButtonColor = false
-	bubble.BorderSizePixel = 0
-	bubble.Active = true
-	bubble.Visible = false
-	bubble.ZIndex = 20
-	bubble.Parent = screenGui
-	corner(bubble, UDim.new(1, 0))
-	stroke(bubble, PALETTE.Orange, 2, 0.05)
-
-	local bubbleScale = Instance.new("UIScale")
-	bubbleScale.Scale = 0
-	bubbleScale.Parent = bubble
+	bubble.Name = "MiniButton"; bubble.AnchorPoint = Vector2.new(0.5, 0.5); bubble.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE); bubble.Position = CENTER; bubble.BackgroundColor3 = PALETTE.Panel; bubble.Text = "M"; bubble.TextColor3 = PALETTE.OrangeSoft; bubble.TextSize = 20; bubble.FontFace = CUSTOM_FONT; bubble.AutoButtonColor = false; bubble.BorderSizePixel = 0; bubble.Active = true; bubble.Visible = false; bubble.ZIndex = 20; bubble.Parent = screenGui
+	corner(bubble, UDim.new(1, 0)); stroke(bubble, PALETTE.Orange, 2, 0.05)
+	local bubbleScale = Instance.new("UIScale"); bubbleScale.Scale = 0; bubbleScale.Parent = bubble
 
 	local function ripple(pos)
-		local r = Instance.new("Frame")
-		r.AnchorPoint = Vector2.new(0.5, 0.5)
-		r.Position = pos
-		r.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE)
-		r.BackgroundTransparency = 1
-		r.BorderSizePixel = 0
-		r.ZIndex = 19
-		r.Parent = screenGui
-		corner(r, UDim.new(1, 0))
-		local rs = stroke(r, PALETTE.Orange, 2, 0.15)
+		local r = Instance.new("Frame"); r.AnchorPoint = Vector2.new(0.5, 0.5); r.Position = pos; r.Size = UDim2.fromOffset(BUBBLE_SIZE, BUBBLE_SIZE); r.BackgroundTransparency = 1; r.BorderSizePixel = 0; r.ZIndex = 19; r.Parent = screenGui
+		corner(r, UDim.new(1, 0)); local rs = stroke(r, PALETTE.Orange, 2, 0.15)
 		local info = TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-		tween(r, info, {Size = UDim2.fromOffset(BUBBLE_SIZE * 2.4, BUBBLE_SIZE * 2.4)})
-		tween(rs, info, {Transparency = 1})
-		task.delay(0.65, function() r:Destroy() end)
+		tween(r, info, {Size = UDim2.fromOffset(BUBBLE_SIZE * 2.4, BUBBLE_SIZE * 2.4)}); tween(rs, info, {Transparency = 1}); task.delay(0.65, function() r:Destroy() end)
 	end
 
 	local minimized, busy = false, false
@@ -303,52 +178,32 @@ function Library:CreateWindow(options)
 		busy = true
 		if not miniPos then miniPos = mainFrame.Position end
 		bubble.Position = miniPos
-
 		local t = 0.5
 		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = shrunk})
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut), {Position = miniPos, Rotation = 14})
 		tween(mainFrame, TweenInfo.new(0.32, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.16), {GroupTransparency = 1})
 		task.wait(t)
-
-		mainFrame.Visible = false
-		mainFrame.Rotation = 0
-
-		bubbleScale.Scale = 0
-		bubble.Visible = true
+		mainFrame.Visible = false; mainFrame.Rotation = 0
+		bubbleScale.Scale = 0; bubble.Visible = true
 		tween(bubbleScale, TweenInfo.new(0.55, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), {Scale = 1})
-		ripple(miniPos)
-
-		minimized = true
-		busy = false
+		ripple(miniPos); minimized = true; busy = false
 	end
 
 	local function expand()
 		if not minimized or busy then return end
 		busy = true
-		local pos = bubble.Position
-		miniPos = pos
-
+		local pos = bubble.Position; miniPos = pos
 		tween(bubbleScale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0})
 		ripple(pos)
-
-		mainFrame.Position = pos
-		mainFrame.Rotation = -14
-		mainScale.Scale = shrunk
-		mainFrame.GroupTransparency = 1
-		mainFrame.Visible = true
+		mainFrame.Position = pos; mainFrame.Rotation = -14; mainScale.Scale = shrunk; mainFrame.GroupTransparency = 1; mainFrame.Visible = true
 		task.wait(0.12)
-
 		local t = 0.65
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Rotation = 0})
 		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
 		tween(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
-		task.wait(0.22)
-		bubble.Visible = false
-		task.wait(t - 0.22)
-
-		minimized = false
-		busy = false
+		task.wait(0.22); bubble.Visible = false; task.wait(t - 0.22)
+		minimized = false; busy = false
 	end
 
 	local function close()
@@ -365,16 +220,13 @@ function Library:CreateWindow(options)
 	connect(closeBtn.MouseButton1Click, close)
 
 	busy = true
-	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 24)
-	mainFrame.GroupTransparency = 1
-	mainScale.Scale = baseScale * 0.85
+	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 24); mainFrame.GroupTransparency = 1; mainScale.Scale = baseScale * 0.85
 	tween(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
 	tween(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
 	tween(mainScale, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
 	task.delay(0.6, function() busy = false end)
 
 	local dragTarget, dragStart, dragOrigin, dragMoved, dragTap
-
 	local function beginDrag(input, target, onTap)
 		if busy then return end
 		if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
@@ -382,12 +234,8 @@ function Library:CreateWindow(options)
 		dragMoved, dragTap = false, onTap
 	end
 
-	connect(bg.InputBegan, function(input)
-		if not minimized then beginDrag(input, mainFrame, nil) end
-	end)
-	connect(bubble.InputBegan, function(input)
-		beginDrag(input, bubble, expand)
-	end)
+	connect(bg.InputBegan, function(input) if not minimized then beginDrag(input, mainFrame, nil) end end)
+	connect(bubble.InputBegan, function(input) beginDrag(input, bubble, expand) end)
 
 	connect(UserInputService.InputChanged, function(input)
 		if not dragTarget then return end
@@ -395,10 +243,7 @@ function Library:CreateWindow(options)
 			local delta = input.Position - dragStart
 			if delta.Magnitude > 4 then dragMoved = true end
 			if dragMoved then
-				dragTarget.Position = UDim2.new(
-					dragOrigin.X.Scale, dragOrigin.X.Offset + delta.X,
-					dragOrigin.Y.Scale, dragOrigin.Y.Offset + delta.Y
-				)
+				dragTarget.Position = UDim2.new(dragOrigin.X.Scale, dragOrigin.X.Offset + delta.X, dragOrigin.Y.Scale, dragOrigin.Y.Offset + delta.Y)
 			end
 		end
 	end)
@@ -417,9 +262,7 @@ function Library:CreateWindow(options)
 	local hidden = false
 	connect(UserInputService.InputBegan, function(input, gp)
 		if gp then return end
-		if input.KeyCode == Enum.KeyCode.X then
-			hidden = not hidden
-			screenGui.Enabled = not hidden
+		if input.KeyCode == Enum.KeyCode.X then hidden = not hidden; screenGui.Enabled = not hidden
 		elseif input.KeyCode == Enum.KeyCode.M and not hidden then
 			if minimized then expand() else collapse() end
 		end
@@ -439,177 +282,83 @@ function Library:CreateWindow(options)
 
 	function WindowAPI:AddTab(tabName)
 		local tabBtn = Instance.new("TextButton")
-		tabBtn.Size = UDim2.new(0, 0, 1, 0)
-		tabBtn.AutomaticSize = Enum.AutomaticSize.X
-		tabBtn.BackgroundColor3 = PALETTE.Panel
-		tabBtn.Text = "  " .. tabName .. "  "
-		tabBtn.TextColor3 = PALETTE.Cream
-		tabBtn.FontFace = CUSTOM_FONT
-		tabBtn.TextSize = 12
-		tabBtn.AutoButtonColor = false
-		tabBtn.BorderSizePixel = 0
-		tabBtn.LayoutOrder = self.TabCount
-		tabBtn.Parent = tabBar
+		tabBtn.Size = UDim2.new(0, 0, 1, 0); tabBtn.AutomaticSize = Enum.AutomaticSize.X; tabBtn.BackgroundColor3 = PALETTE.Panel; tabBtn.Text = "  " .. tabName .. "  "; tabBtn.TextColor3 = PALETTE.Cream; tabBtn.FontFace = CUSTOM_FONT; tabBtn.TextSize = 12; tabBtn.AutoButtonColor = false; tabBtn.BorderSizePixel = 0; tabBtn.LayoutOrder = self.TabCount; tabBtn.Parent = tabBar
 		self.TabCount = self.TabCount + 1
 		corner(tabBtn, UDim.new(0, 6))
 		local btnStroke = stroke(tabBtn, PALETTE.Stroke, 1, 0.6)
 
 		local page = Instance.new("ScrollingFrame")
-		page.Size = UDim2.fromScale(1, 1)
-		page.BackgroundTransparency = 1
-		page.BorderSizePixel = 0
-		page.ScrollBarThickness = 3
-		page.ScrollBarImageColor3 = PALETTE.Orange
-		page.ScrollBarImageTransparency = 0.3
-		page.CanvasSize = UDim2.new(0, 0, 0, 0)
-		page.AutomaticCanvasSize = Enum.AutomaticSize.Y
-		page.Visible = false
-		page.Parent = contentHolder
+		page.Size = UDim2.fromScale(1, 1); page.BackgroundTransparency = 1; page.BorderSizePixel = 0; page.ScrollBarThickness = 3; page.ScrollBarImageColor3 = PALETTE.Orange; page.ScrollBarImageTransparency = 0.3; page.CanvasSize = UDim2.new(0, 0, 0, 0); page.AutomaticCanvasSize = Enum.AutomaticSize.Y; page.Visible = false; page.Parent = contentHolder
 
 		local pageLayout = Instance.new("UIListLayout")
-		pageLayout.Padding = UDim.new(0, 6)
-		pageLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		pageLayout.Parent = page
+		pageLayout.Padding = UDim.new(0, 6); pageLayout.SortOrder = Enum.SortOrder.LayoutOrder; pageLayout.Parent = page
 
 		local TabAPI = { LayoutOrder = 1 }
 		
 		local function renderTab()
 			if ActiveTab == TabAPI then
 				tween(tabBtn, TweenInfo.new(0.2), {BackgroundColor3 = PALETTE.Orange, TextColor3 = Color3.fromRGB(255,255,255)})
-				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Orange, Transparency = 0.2})
-				page.Visible = true
+				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Orange, Transparency = 0.2}); page.Visible = true
 			else
 				tween(tabBtn, TweenInfo.new(0.2), {BackgroundColor3 = PALETTE.Panel, TextColor3 = PALETTE.Muted})
-				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Stroke, Transparency = 0.6})
-				page.Visible = false
+				tween(btnStroke, TweenInfo.new(0.2), {Color = PALETTE.Stroke, Transparency = 0.6}); page.Visible = false
 			end
 		end
 
 		tabBtn.MouseButton1Click:Connect(function()
 			ActiveTab = TabAPI
-			for _, t in pairs(Tabs) do
-				t.Render()
-			end
+			for _, t in pairs(Tabs) do t.Render() end
 		end)
 
-		TabAPI.Render = renderTab
-		table.insert(Tabs, TabAPI)
-
-		if not ActiveTab then
-			ActiveTab = TabAPI
-		end
+		TabAPI.Render = renderTab; table.insert(Tabs, TabAPI)
+		if not ActiveTab then ActiveTab = TabAPI end
 		renderTab()
 
 		function TabAPI:AddToggle(text, callback)
 			local row = Instance.new("TextButton")
-			row.Size = UDim2.new(1, 0, 0, 30)
-			row.BackgroundColor3 = PALETTE.Panel
-			row.BackgroundTransparency = 0.2
-			row.Text = ""
-			row.AutoButtonColor = false
-			row.BorderSizePixel = 0
-			row.LayoutOrder = self.LayoutOrder
-			row.Parent = page
+			row.Size = UDim2.new(1, 0, 0, 30); row.BackgroundColor3 = PALETTE.Panel; row.BackgroundTransparency = 0.2; row.Text = ""; row.AutoButtonColor = false; row.BorderSizePixel = 0; row.LayoutOrder = self.LayoutOrder; row.Parent = page
 			self.LayoutOrder = self.LayoutOrder + 1
 			corner(row, UDim.new(0, 9))
 			local rowStroke = stroke(row, PALETTE.Stroke, 1, 0.6)
-
-			local label = makeLabel(row, text, 13, PALETTE.Cream)
-			label.Position = UDim2.fromOffset(10, 0)
-			label.Size = UDim2.new(1, -58, 1, 0)
-			label.TextTruncate = Enum.TextTruncate.AtEnd
-
-			local track = Instance.new("Frame")
-			track.Size = UDim2.fromOffset(30, 16)
-			track.Position = UDim2.new(1, -40, 0.5, -8)
-			track.BackgroundColor3 = PALETTE.TrackOff
-			track.BorderSizePixel = 0
-			track.Parent = row
+			local label = makeLabel(row, text, 13, PALETTE.Cream); label.Position = UDim2.fromOffset(10, 0); label.Size = UDim2.new(1, -58, 1, 0); label.TextTruncate = Enum.TextTruncate.AtEnd
+			local track = Instance.new("Frame"); track.Size = UDim2.fromOffset(30, 16); track.Position = UDim2.new(1, -40, 0.5, -8); track.BackgroundColor3 = PALETTE.TrackOff; track.BorderSizePixel = 0; track.Parent = row
 			corner(track, UDim.new(1, 0))
-
-			local knob = Instance.new("Frame")
-			knob.Size = UDim2.fromOffset(12, 12)
-			knob.Position = UDim2.new(0, 2, 0.5, -6)
-			knob.BackgroundColor3 = PALETTE.Cream
-			knob.BorderSizePixel = 0
-			knob.Parent = track
+			local knob = Instance.new("Frame"); knob.Size = UDim2.fromOffset(12, 12); knob.Position = UDim2.new(0, 2, 0.5, -6); knob.BackgroundColor3 = PALETTE.Cream; knob.BorderSizePixel = 0; knob.Parent = track
 			corner(knob, UDim.new(1, 0))
 
 			local state = false
 			local info = TweenInfo.new(0.22, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
-
 			local function render()
 				tween(track, info, {BackgroundColor3 = state and PALETTE.Orange or PALETTE.TrackOff})
 				tween(knob, info, {Position = state and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
 				tween(rowStroke, info, {Color = state and PALETTE.Orange or PALETTE.Stroke, Transparency = state and 0.15 or 0.6})
 				tween(label, info, {TextColor3 = state and PALETTE.Cream or PALETTE.Cream})
 			end
-
 			local hover = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 			row.MouseEnter:Connect(function() tween(row, hover, {BackgroundTransparency = 0.05}) end)
 			row.MouseLeave:Connect(function() tween(row, hover, {BackgroundTransparency = 0.2}) end)
-
 			local function fire()
 				if not callback then return end
 				local ok, err = pcall(callback, state)
 				if not ok then warn("[" .. name .. "] error en '" .. tostring(text) .. "':", err) end
 			end
-
-			row.MouseButton1Click:Connect(function()
-				state = not state
-				render()
-				fire()
-			end)
-
-			return {
-				Set = function(_, v)
-					v = v and true or false
-					if v == state then return end
-					state = v
-					render()
-					fire()
-				end,
-				Get = function() return state end,
-			}
+			row.MouseButton1Click:Connect(function() state = not state; render(); fire() end)
+			return { Set = function(_, v) v = v and true or false; if v == state then return end; state = v; render(); fire() end, Get = function() return state end }
 		end
 
 		function TabAPI:AddButton(text, callback)
 			local b = Instance.new("TextButton")
-			b.Size = UDim2.new(1, 0, 0, 28)
-			b.BackgroundColor3 = PALETTE.Panel
-			b.BackgroundTransparency = 0.1
-			b.Text = text
-			b.TextColor3 = PALETTE.Cream
-			b.TextSize = 13
-			b.FontFace = CUSTOM_FONT
-			b.AutoButtonColor = false
-			b.BorderSizePixel = 0
-			b.LayoutOrder = self.LayoutOrder
-			b.Parent = page
+			b.Size = UDim2.new(1, 0, 0, 28); b.BackgroundColor3 = PALETTE.Panel; b.BackgroundTransparency = 0.1; b.Text = text; b.TextColor3 = PALETTE.Cream; b.TextSize = 13; b.FontFace = CUSTOM_FONT; b.AutoButtonColor = false; b.BorderSizePixel = 0; b.LayoutOrder = self.LayoutOrder; b.Parent = page
 			self.LayoutOrder = self.LayoutOrder + 1
 			corner(b, UDim.new(0, 8))
 			local bStroke = stroke(b, PALETTE.Stroke, 1, 0.65)
-
-			local accent = Instance.new("Frame")
-			accent.Size = UDim2.fromOffset(3, 12)
-			accent.Position = UDim2.new(0, 7, 0.5, -6)
-			accent.BackgroundColor3 = PALETTE.Orange
-			accent.BorderSizePixel = 0
-			accent.Parent = b
+			local accent = Instance.new("Frame"); accent.Size = UDim2.fromOffset(3, 12); accent.Position = UDim2.new(0, 7, 0.5, -6); accent.BackgroundColor3 = PALETTE.Orange; accent.BorderSizePixel = 0; accent.Parent = b
 			corner(accent, UDim.new(1, 0))
-
 			local fast = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-			b.MouseEnter:Connect(function()
-				tween(b, fast, {BackgroundTransparency = 0})
-				tween(bStroke, fast, {Color = PALETTE.Orange, Transparency = 0.35})
-			end)
-			b.MouseLeave:Connect(function()
-				tween(b, fast, {BackgroundTransparency = 0.1, BackgroundColor3 = PALETTE.Panel})
-				tween(bStroke, fast, {Color = PALETTE.Stroke, Transparency = 0.65})
-			end)
+			b.MouseEnter:Connect(function() tween(b, fast, {BackgroundTransparency = 0}); tween(bStroke, fast, {Color = PALETTE.Orange, Transparency = 0.35}) end)
+			b.MouseLeave:Connect(function() tween(b, fast, {BackgroundTransparency = 0.1, BackgroundColor3 = PALETTE.Panel}); tween(bStroke, fast, {Color = PALETTE.Stroke, Transparency = 0.65}) end)
 			b.MouseButton1Down:Connect(function() tween(b, fast, {BackgroundColor3 = PALETTE.PanelLight}) end)
 			b.MouseButton1Up:Connect(function() tween(b, fast, {BackgroundColor3 = PALETTE.Panel}) end)
-
 			b.MouseButton1Click:Connect(function()
 				if not callback then return end
 				local ok, err = pcall(callback)
@@ -620,32 +369,16 @@ function Library:CreateWindow(options)
 
 		function TabAPI:AddSection(text)
 			local holder = Instance.new("Frame")
-			holder.Size = UDim2.new(1, 0, 0, 22)
-			holder.BackgroundTransparency = 1
-			holder.LayoutOrder = self.LayoutOrder
-			holder.Parent = page
+			holder.Size = UDim2.new(1, 0, 0, 22); holder.BackgroundTransparency = 1; holder.LayoutOrder = self.LayoutOrder; holder.Parent = page
 			self.LayoutOrder = self.LayoutOrder + 1
-
-			local l = makeLabel(holder, text, 12, PALETTE.OrangeSoft)
-			l.Size = UDim2.new(1, 0, 0, 18)
-			l.Position = UDim2.fromOffset(2, 0)
-			l.TextStrokeTransparency = 0.6
-			l.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
-
-			local line = Instance.new("Frame")
-			line.Size = UDim2.new(1, -4, 0, 1)
-			line.Position = UDim2.new(0, 2, 1, -2)
-			line.BackgroundColor3 = PALETTE.Stroke
-			line.BackgroundTransparency = 0.55
-			line.BorderSizePixel = 0
-			line.Parent = holder
+			local l = makeLabel(holder, text, 12, PALETTE.OrangeSoft); l.Size = UDim2.new(1, 0, 0, 18); l.Position = UDim2.fromOffset(2, 0); l.TextStrokeTransparency = 0.6; l.TextStrokeColor3 = Color3.fromRGB(20, 8, 34)
+			local line = Instance.new("Frame"); line.Size = UDim2.new(1, -4, 0, 1); line.Position = UDim2.new(0, 2, 1, -2); line.BackgroundColor3 = PALETTE.Stroke; line.BackgroundTransparency = 0.55; line.BorderSizePixel = 0; line.Parent = holder
 		end
 
 		return TabAPI
 	end
 
 	function WindowAPI:Destroy() close() end
-
 	return WindowAPI
 end
 
