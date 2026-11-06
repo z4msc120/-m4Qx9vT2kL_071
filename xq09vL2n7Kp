@@ -14,16 +14,17 @@ pcall(function()
         local oldFiles = {
             "bloodyghost.ttf", "bloodyghost.json", "bloodyghost.version",
             "BloodyGhost.ttf", "BloodyGhost.json", "BloodyGhost.version",
-            "christmassnow.ttf", "christmassnow.json", "christmassnow.version"
+            "christmassnow.ttf", "christmassnow.json", "christmassnow.version",
+            "josephsophia.ttf", "josephsophia.json", "josephsophia.version"
         }
         for _, file in ipairs(oldFiles) do
             if isfile(file) then pcall(delfile, file) end
         end
 
-        local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/josephsophia.ttf"
-        local FONT_NAME    = "JosephSophia"
-        local FONT_FILE    = "josephsophia.ttf"
-        local FONT_JSON    = "josephsophia.json"
+        local FONT_URL     = "https://github.com/samxzqpq/Roblox-Fonts-/raw/refs/heads/main/Super%20Whales.ttf"
+        local FONT_NAME    = "SuperWhales"
+        local FONT_FILE    = "superwhales.ttf"
+        local FONT_JSON    = "superwhales.json"
 
         if not isfile(FONT_FILE) then
             writefile(FONT_FILE, game:HttpGet(FONT_URL))
@@ -39,15 +40,12 @@ pcall(function()
     end
 end)
 
--- LÓGICA CORREGIDA: Usa WaitForChild para evitar que devuelva nil al iniciar en PC
 local function getGuiParent()
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
     
     if isMobile then
-        -- En Móvil (Delta): Usar CoreGui / gethui
         local ok, hui = pcall(function() return gethui() end)
         if ok and hui then return hui end
-        
         local ok2, cg = pcall(function() return CoreGui end)
         if ok2 and cg then
             local test = Instance.new("Folder")
@@ -56,13 +54,11 @@ local function getGuiParent()
             if success then return cg end
         end
     else
-        -- En PC: Usar PlayerGui con espera segura
-        local pg = Player:WaitForChild("PlayerGui", 10)
+        local pg = Player:FindFirstChildOfClass("PlayerGui")
         if pg then return pg end
     end
 
-    -- Fallback seguro
-    local pg = Player:WaitForChild("PlayerGui", 10)
+    local pg = Player:FindFirstChildOfClass("PlayerGui")
     if pg then return pg end
     local ok, hui = pcall(function() return gethui() end)
     if ok and hui then return hui end
