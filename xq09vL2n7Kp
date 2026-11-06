@@ -6,6 +6,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
+-- Fuente por defecto en caso de que falle la descarga
 local CUSTOM_FONT = Font.fromEnum(Enum.Font.FredokaOne)
 
 pcall(function()
@@ -23,20 +24,11 @@ pcall(function()
         local FONT_NAME    = "JosephSophia"
         local FONT_FILE    = "josephsophia.ttf"
         local FONT_JSON    = "josephsophia.json"
-        local FONT_VERSION = "1"
-        local VERSION_FILE = "josephsophia.version"
 
-        local savedVersion = nil
-        if isfile(VERSION_FILE) then
-            local ok, v = pcall(readfile, VERSION_FILE)
-            if ok then savedVersion = v end
-        end
-        local needsDownload = (savedVersion ~= FONT_VERSION) or (not isfile(FONT_FILE))
-        if needsDownload then
+        if not isfile(FONT_FILE) then
             writefile(FONT_FILE, game:HttpGet(FONT_URL))
-            writefile(VERSION_FILE, FONT_VERSION)
-            if isfile(FONT_JSON) then pcall(delfile, FONT_JSON) end
         end
+        
         writefile(FONT_JSON, HttpService:JSONEncode({
             name  = FONT_NAME,
             faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
@@ -47,7 +39,7 @@ pcall(function()
     end
 end)
 
--- FUNCIÓN CORREGIDA: Usa PlayerGui para evitar errores de permisos en CoreGui
+-- Usa PlayerGui (evita errores de permisos en CoreGui)
 local function getGuiParent()
 	local pg = Player:FindFirstChildOfClass("PlayerGui")
 	if pg then return pg end
