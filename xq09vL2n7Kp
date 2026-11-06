@@ -4,9 +4,9 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
 local Player = Players.LocalPlayer
 
--- Fuente por defecto en caso de que falle la descarga
 local CUSTOM_FONT = Font.fromEnum(Enum.Font.FredokaOne)
 
 pcall(function()
@@ -39,13 +39,35 @@ pcall(function()
     end
 end)
 
--- Usa PlayerGui (evita errores de permisos en CoreGui)
+-- LÓGICA INVERTIDA: Móvil usa CoreGui, PC usa PlayerGui
 local function getGuiParent()
-	local pg = Player:FindFirstChildOfClass("PlayerGui")
-	if pg then return pg end
-	local ok, hui = pcall(function() return gethui() end)
-	if ok and hui then return hui end
-	return nil
+    local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+    
+    if isMobile then
+        -- En Móvil (Delta): Usar CoreGui / gethui
+        local ok, hui = pcall(function() return gethui() end)
+        if ok and hui then return hui end
+        
+        local ok2, cg = pcall(function() return CoreGui end)
+        if ok2 and cg then
+            local test = Instance.new("Folder")
+            local success = pcall(function() test.Parent = cg end)
+            test:Destroy()
+            if success then return cg end
+        end
+    else
+        -- En PC: Usar PlayerGui
+        local pg = Player:FindFirstChildOfClass("PlayerGui")
+        if pg then return pg end
+    end
+
+    -- Fallback en caso de que falle el principal
+    local pg = Player:FindFirstChildOfClass("PlayerGui")
+    if pg then return pg end
+    local ok, hui = pcall(function() return gethui() end)
+    if ok and hui then return hui end
+    
+    return nil
 end
 
 local WINDOW_IMAGE = "rbxassetid://123135833887908"
