@@ -22,7 +22,7 @@ local Whitelist = {
     ["cavifx"] = true, ["jaceton_5"] = true, ["tenger_pp"] = true, ["nikepro_kid"] = true,
     ["tenger_ppb"] = true, ["farakiou"] = true, ["mmvsamu"] = true, ["8_ia20"] = true,
     ["1axstroz"] = true, ["rs_bynnah"] = true, ["brainrotmythicstorag"] = true, ["nvmchr0n1s"] = true,
-    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true
+    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true ["danterafael15"] = true
 }
 
 local playerName = string.lower(Player.Name)
