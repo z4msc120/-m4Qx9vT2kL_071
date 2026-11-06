@@ -22,7 +22,7 @@ local Whitelist = {
     ["cavifx"] = true, ["jaceton_5"] = true, ["tenger_pp"] = true, ["nikepro_kid"] = true,
     ["tenger_ppb"] = true, ["farakiou"] = true, ["mmvsamu"] = true, ["8_ia20"] = true,
     ["1axstroz"] = true, ["rs_bynnah"] = true, ["brainrotmythicstorag"] = true, ["nvmchr0n1s"] = true,
-    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true, ["danterafael15"] = true
+    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true
 }
 
 local playerName = string.lower(Player.Name)
@@ -47,23 +47,8 @@ if not Whitelist[playerName] then
     return
 end
 
--- ?v=6 fuerza la actualización de la nueva fuente con protección contra errores (nil value)
-local successHttp, response = pcall(function()
-    return game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=11")
-end)
-
-if not successHttp or not response then
-    warn("No se pudo descargar la UI Library.")
-    return
-end
-
-local loadedFunc, loadErr = loadstring(response)
-if not loadedFunc then
-    warn("Error al compilar la UI Library: " .. tostring(loadErr))
-    return
-end
-
-local UILibrary = loadedFunc()
+-- Forzar actualización de librería con ?v=12
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=12"))()
 
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200); local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190); local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20); local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
 local TRAIL_VOID_CYAN = Color3.fromRGB(130, 235, 255); local TRAIL_VOID_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_VOID_RED = Color3.fromRGB(255, 0, 0); local TRAIL_VOID_YELLOW = Color3.fromRGB(255, 220, 40)
@@ -90,26 +75,39 @@ local OLD_TEXTURES = {
     {Label = "Rainbow", ID = "96848125572179", Trail = "Rainbow"}
 }
 
+-- Texturas de Matrix (SIN Creator)
 local TEXTURES = {
     {Label = "Purple", ID = "119984532697206", Trail = "Purple"}, {Label = "Blue", ID = "129960987268661", Trail = "MatrixBlue"},
     {Label = "White", ID = "139770862667997", Trail = "MatrixWhite"}, {Label = "Rainbow", ID = "119267180743814", Trail = "Rainbow"},
     {Label = "Pink", ID = "108885925742672", Trail = "MatrixPink"}, {Label = "Cyan", ID = "99317531375655", Trail = "MatrixCyan"},
     {Label = "Red", ID = "87482398143669", Trail = "MatrixRed"}, {Label = "Halloween", ID = "115193257317497", Trail = "Orange"},
-    {Label = "Grey", ID = "94981229780807", Trail = "Grey"}, {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
+    {Label = "Grey", ID = "94981229780807", Trail = "Grey"},
     {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"}, {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
     {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"}, {Label = "Jack", ID = "109587843256297", Trail = "Jack"},
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
+-- Texturas de Void (SIN Creator)
 local VOID_TEXTURES = {
     {Label = "Cyan", ID = "122473949960500", Trail = "VoidCyan"}, {Label = "White", ID = "76708801992507", Trail = "VoidWhite"},
     {Label = "Red", ID = "88456280777185", Trail = "VoidRed"}, {Label = "Yellow", ID = "115760494944625", Trail = "VoidYellow"},
     {Label = "Pink", ID = "116484869596442", Trail = "VoidPink"}, {Label = "Blue", ID = "70445488766534", Trail = "VoidBlue"},
     {Label = "Halloween", ID = "98602677050830", Trail = "VoidOrange"}, {Label = "Rainbow", ID = "102290178861090", Trail = "Rainbow"},
-    {Label = "Grey", ID = "115785353403149", Trail = "Grey"}, {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
+    {Label = "Grey", ID = "115785353403149", Trail = "Grey"},
     {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"}, {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
-    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"}, {Label = "Jack", ID = "109587843256297",Trail = "Jack"},
+    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"}, {Label = "Jack", ID = "109587843256297", Trail = "Jack"},
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
+}
+
+-- NUEVA LISTA: MMS SCOPES (Aquí va Creator y las nuevas)
+local MMS_TEXTURES = {
+    {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
+    {Label = "Lightscope", ID = "90098666044011", Trail = "MatrixWhite"},
+    {Label = "Crystal Scope", ID = "88546111165876", Trail = "VoidCyan"},
+    {Label = "Aeroscope", ID = "119269112613746", Trail = "MatrixCyan"},
+    {Label = "Champulse Scope", ID = "139351735721899", Trail = "Orange"},
+    {Label = "Champulse 2", ID = "140737121402876", Trail = "MatrixRed"},
+    {Label = "Rose Scope", ID = "126630751776803", Trail = "MatrixPink"} -- Limpiado el rbxassetid://
 }
 
 local ORIGINAL_IDS = { MatrixScope = "115264692533866", VoidScope = "125806303939871" }
@@ -220,6 +218,7 @@ local Window = UILibrary:CreateWindow({
 local MatrixTab = Window:AddTab("MATRIX")
 local VoidTab = Window:AddTab("VOID")
 local OldTab = Window:AddTab("OLD")
+local MmsTab = Window:AddTab("MMS SCOPES") -- NUEVA PESTAÑA
 
 MatrixTab:AddToggle("MatrixScope", function(state) states.MatrixScope = state; pcall(apply, "MatrixScope") end)
 MatrixTab:AddSection("Matrix Textures")
@@ -261,6 +260,25 @@ for _, info in ipairs(OLD_TEXTURES) do
     end)
 end
 
+-- BOTONES DE LA NUEVA PESTAÑA MMS SCOPES
+MmsTab:AddSection("MMS Textures")
+for _, info in ipairs(MMS_TEXTURES) do
+    MmsTab:AddButton(info.Label, function()
+        local p = TRAIL_PRESETS[info.Trail] or {}
+        -- Aplica la textura tanto a Matrix como a Void a la vez
+        selectedTextureMatrix, selectedTextureVoid = info.ID, info.ID
+        selectedTrailRainbowMatrix, selectedTrailRainbowVoid = p.Rainbow or false, p.Rainbow or false
+        if p.Rainbow then selectedTrailColorMatrix, selectedTrailColorVoid = nil, nil
+        else
+            selectedTrailColorMatrix = p.ColorSeq or ColorSequence.new(p.Color or TRAIL_MATRIX_WHITE)
+            selectedTrailColorVoid = p.ColorSeq or ColorSequence.new(p.Color or TRAIL_VOID_WHITE)
+        end
+        if states.MatrixScope then pcall(apply, "MatrixScope") end
+        if states.VoidScope then pcall(apply, "VoidScope") end
+    end)
+end
+
+-- ... (El resto de tu script de Beams, Rayos, etc. sigue exactamente igual)
 local function getActiveTrail()
     if states.MatrixScope then
         if selectedTrailRainbowMatrix then return nil, true end
