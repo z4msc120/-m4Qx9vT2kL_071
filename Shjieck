@@ -22,7 +22,7 @@ local Whitelist = {
     ["cavifx"] = true, ["jaceton_5"] = true, ["tenger_pp"] = true, ["nikepro_kid"] = true,
     ["tenger_ppb"] = true, ["farakiou"] = true, ["mmvsamu"] = true, ["8_ia20"] = true,
     ["1axstroz"] = true, ["rs_bynnah"] = true, ["brainrotmythicstorag"] = true, ["nvmchr0n1s"] = true,
-    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true ["danterafael15"] = true
+    ["woozywozz"] = true, ["rnz2304"] = true, ["tozety45"] = true, ["danterafael15"] = true
 }
 
 local playerName = string.lower(Player.Name)
@@ -47,8 +47,23 @@ if not Whitelist[playerName] then
     return
 end
 
--- ?v=6 fuerza la actualización de la nueva fuente
-local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=11"))()
+-- ?v=6 fuerza la actualización de la nueva fuente con protección contra errores (nil value)
+local successHttp, response = pcall(function()
+    return game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=11")
+end)
+
+if not successHttp or not response then
+    warn("No se pudo descargar la UI Library.")
+    return
+end
+
+local loadedFunc, loadErr = loadstring(response)
+if not loadedFunc then
+    warn("Error al compilar la UI Library: " .. tostring(loadErr))
+    return
+end
+
+local UILibrary = loadedFunc()
 
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200); local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190); local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20); local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
 local TRAIL_VOID_CYAN = Color3.fromRGB(130, 235, 255); local TRAIL_VOID_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_VOID_RED = Color3.fromRGB(255, 0, 0); local TRAIL_VOID_YELLOW = Color3.fromRGB(255, 220, 40)
@@ -93,7 +108,7 @@ local VOID_TEXTURES = {
     {Label = "Halloween", ID = "98602677050830", Trail = "VoidOrange"}, {Label = "Rainbow", ID = "102290178861090", Trail = "Rainbow"},
     {Label = "Grey", ID = "115785353403149", Trail = "Grey"}, {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
     {Label = "Corpse Bride", ID = "99300868991906", Trail = "CorpseBride"}, {Label = "Ladybug", ID = "71522848977154", Trail = "Ladybug"},
-    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"}, {Label = "Jack", ID = "109587843256297", Trail = "Jack"},
+    {Label = "Coraline", ID = "97521997808980", Trail = "Coraline"}, {Label = "Jack", ID = "109587843256297",Trail = "Jack"},
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
@@ -124,15 +139,6 @@ local function isKnifeObj(obj)
 			for _, kw in ipairs(KNIFE_KEYWORDS) do if string.find(n, kw, 1, true) then return true end end
 			return false
 		end
-		c = c.Parent
-	end
-	return false
-end
-
-local function isInsideTool(obj)
-	local c = obj.Parent
-	while c and c ~= game do
-		if c:IsA("Tool") then return true end
 		c = c.Parent
 	end
 	return false
