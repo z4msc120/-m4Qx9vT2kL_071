@@ -47,14 +47,21 @@ if not Whitelist[playerName] then
     return
 end
 
--- Forzar actualización de librería con ?v=12
-local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=12"))()
+-- Forzar actualización de librería (por si acaso)
+local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=13"))()
 
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200); local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190); local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20); local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
 local TRAIL_VOID_CYAN = Color3.fromRGB(130, 235, 255); local TRAIL_VOID_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_VOID_RED = Color3.fromRGB(255, 0, 0); local TRAIL_VOID_YELLOW = Color3.fromRGB(255, 220, 40)
 local TRAIL_VOID_PINK = Color3.fromRGB(255, 105, 180); local TRAIL_VOID_BLUE = Color3.fromRGB(30, 80, 255); local TRAIL_PURPLE = Color3.fromRGB(110, 30, 180)
 local TRAIL_MATRIX_BLUE = Color3.fromRGB(30, 80, 220); local TRAIL_MATRIX_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_MATRIX_PINK = Color3.fromRGB(255, 80, 190); local TRAIL_MATRIX_CYAN = Color3.fromRGB(130, 235, 255)
 local TRAIL_MATRIX_RED = Color3.fromRGB(255, 40, 40); local TRAIL_ORANGE = Color3.fromRGB(255, 130, 20); local TRAIL_GREY = Color3.fromRGB(120, 120, 120)
+
+-- NUEVOS COLORES PARA MMS SCOPES
+local TRAIL_CRYSTAL_CYAN = Color3.fromRGB(130, 235, 255)
+local TRAIL_CRYSTAL_PINK = Color3.fromRGB(255, 105, 180)
+local TRAIL_LIGHT_YELLOW = Color3.fromRGB(255, 255, 50)
+local TRAIL_AERO_GREEN = Color3.fromRGB(0, 255, 100)
+local TRAIL_ROSE_PINK = Color3.fromRGB(255, 182, 193)
 
 local TRAIL_PRESETS = {
     OldBlue = {Color = TRAIL_OLD_BLUE}, OldPink = {Color = TRAIL_OLD_PINK}, OldRed = {Color = TRAIL_OLD_RED}, OldYellow = {Color = TRAIL_OLD_YELLOW}, Rainbow = {Rainbow = true},
@@ -66,7 +73,12 @@ local TRAIL_PRESETS = {
     Coraline   = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 139))})},
     Jack       = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))})},
     Coco       = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 140, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(128, 0, 128))})},
-    Addams     = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))})}
+    Addams     = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))})},
+    -- NUEVOS PRESETS
+    CrystalMix = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, TRAIL_CRYSTAL_CYAN), ColorSequenceKeypoint.new(1, TRAIL_CRYSTAL_PINK)})},
+    LightYellow= {Color = TRAIL_LIGHT_YELLOW},
+    AeroGreen  = {Color = TRAIL_AERO_GREEN},
+    RosePink   = {Color = TRAIL_ROSE_PINK}
 }
 
 local OLD_TEXTURES = {
@@ -75,7 +87,6 @@ local OLD_TEXTURES = {
     {Label = "Rainbow", ID = "96848125572179", Trail = "Rainbow"}
 }
 
--- Texturas de Matrix (SIN Creator)
 local TEXTURES = {
     {Label = "Purple", ID = "119984532697206", Trail = "Purple"}, {Label = "Blue", ID = "129960987268661", Trail = "MatrixBlue"},
     {Label = "White", ID = "139770862667997", Trail = "MatrixWhite"}, {Label = "Rainbow", ID = "119267180743814", Trail = "Rainbow"},
@@ -87,7 +98,6 @@ local TEXTURES = {
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
--- Texturas de Void (SIN Creator)
 local VOID_TEXTURES = {
     {Label = "Cyan", ID = "122473949960500", Trail = "VoidCyan"}, {Label = "White", ID = "76708801992507", Trail = "VoidWhite"},
     {Label = "Red", ID = "88456280777185", Trail = "VoidRed"}, {Label = "Yellow", ID = "115760494944625", Trail = "VoidYellow"},
@@ -99,15 +109,13 @@ local VOID_TEXTURES = {
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
--- NUEVA LISTA: MMS SCOPES (Aquí va Creator y las nuevas)
+-- ACTUALIZADO: Sin Champulse y con los nuevos colores asignados
 local MMS_TEXTURES = {
     {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
-    {Label = "Lightscope", ID = "90098666044011", Trail = "MatrixWhite"},
-    {Label = "Crystal Scope", ID = "88546111165876", Trail = "VoidCyan"},
-    {Label = "Aeroscope", ID = "119269112613746", Trail = "MatrixCyan"},
-    {Label = "Champulse Scope", ID = "139351735721899", Trail = "Orange"},
-    {Label = "Champulse 2", ID = "140737121402876", Trail = "MatrixRed"},
-    {Label = "Rose Scope", ID = "126630751776803", Trail = "MatrixPink"} -- Limpiado el rbxassetid://
+    {Label = "Lightscope", ID = "90098666044011", Trail = "LightYellow"},
+    {Label = "Crystal Scope", ID = "88546111165876", Trail = "CrystalMix"},
+    {Label = "Aeroscope", ID = "119269112613746", Trail = "AeroGreen"},
+    {Label = "Rose Scope", ID = "126630751776803", Trail = "RosePink"}
 }
 
 local ORIGINAL_IDS = { MatrixScope = "115264692533866", VoidScope = "125806303939871" }
@@ -218,7 +226,7 @@ local Window = UILibrary:CreateWindow({
 local MatrixTab = Window:AddTab("MATRIX")
 local VoidTab = Window:AddTab("VOID")
 local OldTab = Window:AddTab("OLD")
-local MmsTab = Window:AddTab("MMS SCOPES") -- NUEVA PESTAÑA
+local MmsTab = Window:AddTab("MMS SCOPES")
 
 MatrixTab:AddToggle("MatrixScope", function(state) states.MatrixScope = state; pcall(apply, "MatrixScope") end)
 MatrixTab:AddSection("Matrix Textures")
@@ -260,7 +268,7 @@ for _, info in ipairs(OLD_TEXTURES) do
     end)
 end
 
--- BOTONES DE LA NUEVA PESTAÑA MMS SCOPES
+-- PESTAÑA MMS SCOPES
 MmsTab:AddSection("MMS Textures")
 for _, info in ipairs(MMS_TEXTURES) do
     MmsTab:AddButton(info.Label, function()
@@ -278,7 +286,6 @@ for _, info in ipairs(MMS_TEXTURES) do
     end)
 end
 
--- ... (El resto de tu script de Beams, Rayos, etc. sigue exactamente igual)
 local function getActiveTrail()
     if states.MatrixScope then
         if selectedTrailRainbowMatrix then return nil, true end
