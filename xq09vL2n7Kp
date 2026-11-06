@@ -39,7 +39,7 @@ pcall(function()
     end
 end)
 
--- LÓGICA INVERTIDA: Móvil usa CoreGui, PC usa PlayerGui
+-- LÓGICA CORREGIDA: Usa WaitForChild para evitar que devuelva nil al iniciar en PC
 local function getGuiParent()
     local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
     
@@ -56,13 +56,13 @@ local function getGuiParent()
             if success then return cg end
         end
     else
-        -- En PC: Usar PlayerGui
-        local pg = Player:FindFirstChildOfClass("PlayerGui")
+        -- En PC: Usar PlayerGui con espera segura
+        local pg = Player:WaitForChild("PlayerGui", 10)
         if pg then return pg end
     end
 
-    -- Fallback en caso de que falle el principal
-    local pg = Player:FindFirstChildOfClass("PlayerGui")
+    -- Fallback seguro
+    local pg = Player:WaitForChild("PlayerGui", 10)
     if pg then return pg end
     local ok, hui = pcall(function() return gethui() end)
     if ok and hui then return hui end
