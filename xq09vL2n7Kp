@@ -4,12 +4,10 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
 local Player = Players.LocalPlayer
 
 local CUSTOM_FONT = Font.fromEnum(Enum.Font.FredokaOne)
 
--- Carga de fuente personalizada
 pcall(function()
     if isfile and delfile and writefile and getcustomasset then
         local oldFiles = {
@@ -28,41 +26,26 @@ pcall(function()
         local FONT_JSON    = "superwhales.json"
 
         if not isfile(FONT_FILE) then
-            local success, res = pcall(function() return game:HttpGet(FONT_URL) end)
-            if success and res and not string.find(res, "<html") and not string.find(res, "<DOCTYPE") then
-                writefile(FONT_FILE, res)
-            end
+            writefile(FONT_FILE, game:HttpGet(FONT_URL))
         end
         
-        if isfile(FONT_FILE) then
-            writefile(FONT_JSON, HttpService:JSONEncode({
-                name  = FONT_NAME,
-                faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
-            }))
-            
-            local success, newFont = pcall(function() return Font.new(getcustomasset(FONT_JSON)) end)
-            if success and newFont then CUSTOM_FONT = newFont end
-        end
+        writefile(FONT_JSON, HttpService:JSONEncode({
+            name  = FONT_NAME,
+            faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
+        }))
+        
+        local success, newFont = pcall(function() return Font.new(getcustomasset(FONT_JSON)) end)
+        if success and newFont then CUSTOM_FONT = newFont end
     end
 end)
 
--- SOLUCIÓN PC: Priorizar gethui() / CoreGui protegido para evitar que el anti-cheat crashee el juego
 local function getGuiParent()
-    local okHui, hui = pcall(function() return gethui() end)
-    if okHui and hui then return hui end
-
-    local okCg, cg = pcall(function() return CoreGui end)
-    if okCg and cg then
-        local test = Instance.new("Folder")
-        local success = pcall(function() test.Parent = cg end)
-        test:Destroy()
-        if success then return cg end
-    end
-
     local pg = Player:FindFirstChildOfClass("PlayerGui")
     if pg then return pg end
     
-    return nil
+    local newPg = Instance.new("PlayerGui")
+    newPg.Parent = Player
+    return newPg
 end
 
 local WINDOW_IMAGE = "rbxassetid://123135833887908"
@@ -115,16 +98,9 @@ function Library:CreateWindow(options)
 	end
 
 	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = name; screenGui.ResetOnSpawn = false; screenGui.IgnoreGuiInset = true; screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; screenGui.DisplayOrder = 999999
-	
-	-- Protección extra para ejecutores de PC
-	pcall(function()
-		local protectGui = protectgui or (syn and syn.protect_gui)
-		if protectGui then protectGui(screenGui) end
-	end)
-	screenGui.Parent = guiParent
+	screenGui.Name = name; screenGui.ResetOnSpawn = false; screenGui.IgnoreGuiInset = true; screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; screenGui.DisplayOrder = 999999; screenGui.Parent = guiParent
 
-	local mainFrame = Instance.new("Frame")
+	local mainFrame = Instance.new("CanvasGroup")
 	mainFrame.Name = "MainFrame"; mainFrame.AnchorPoint = Vector2.new(0.5, 0.5); mainFrame.Size = UDim2.fromOffset(WINDOW_W, WINDOW_H); mainFrame.Position = CENTER; mainFrame.BackgroundTransparency = 1; mainFrame.BorderSizePixel = 0; mainFrame.Active = true; mainFrame.Parent = screenGui
 
 	local mainScale = Instance.new("UIScale"); mainScale.Parent = mainFrame
@@ -207,6 +183,7 @@ function Library:CreateWindow(options)
 		local t = 0.5
 		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = shrunk})
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quart, Enum.EasingDirection.InOut), {Position = miniPos, Rotation = 14})
+		tween(mainFrame, TweenInfo.new(0.32, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 0.16), {GroupTransparency = 1})
 		task.wait(t)
 		mainFrame.Visible = false; mainFrame.Rotation = 0
 		bubbleScale.Scale = 0; bubble.Visible = true
@@ -220,12 +197,13 @@ function Library:CreateWindow(options)
 		local pos = bubble.Position; miniPos = pos
 		tween(bubbleScale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = 0})
 		ripple(pos)
-		mainFrame.Position = pos; mainFrame.Rotation = -14; mainScale.Scale = shrunk; mainFrame.Visible = true
+		mainFrame.Position = pos; mainFrame.Rotation = -14; mainScale.Scale = shrunk; mainFrame.GroupTransparency = 1; mainFrame.Visible = true
 		task.wait(0.12)
 		local t = 0.65
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
 		tween(mainFrame, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Rotation = 0})
 		tween(mainScale, TweenInfo.new(t, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
+		tween(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
 		task.wait(0.22); bubble.Visible = false; task.wait(t - 0.22)
 		minimized = false; busy = false
 	end
@@ -234,6 +212,7 @@ function Library:CreateWindow(options)
 		if busy then return end
 		busy = true
 		tween(mainScale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Scale = baseScale * 0.8})
+		tween(mainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {GroupTransparency = 1})
 		task.wait(0.32)
 		for _, c in ipairs(connections) do c:Disconnect() end
 		screenGui:Destroy()
@@ -243,8 +222,9 @@ function Library:CreateWindow(options)
 	connect(closeBtn.MouseButton1Click, close)
 
 	busy = true
-	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 24); mainScale.Scale = baseScale * 0.85
+	mainFrame.Position = UDim2.new(0.5, 0, 0.5, 24); mainFrame.GroupTransparency = 1; mainScale.Scale = baseScale * 0.85
 	tween(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = CENTER})
+	tween(mainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {GroupTransparency = 0})
 	tween(mainScale, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = baseScale})
 	task.delay(0.6, function() busy = false end)
 
@@ -327,9 +307,10 @@ function Library:CreateWindow(options)
 		indicator.Parent = tabBtn
 		corner(indicator, UDim.new(1, 0))
 
-		local pageContainer = Instance.new("Frame")
+		local pageContainer = Instance.new("CanvasGroup")
 		pageContainer.Size = UDim2.fromScale(1, 1)
 		pageContainer.BackgroundTransparency = 1
+		pageContainer.GroupTransparency = 1
 		pageContainer.Visible = false
 		pageContainer.ZIndex = 3
 		pageContainer.Parent = contentHolder
@@ -346,11 +327,29 @@ function Library:CreateWindow(options)
 			if ActiveTab == TabAPI then
 				tween(tabBtn, TweenInfo.new(0.2), {TextColor3 = PALETTE.Cream})
 				indicator.Visible = true
+				
 				pageContainer.Visible = true
+				pageContainer.Position = UDim2.new(0, 15, 0, 0)
+				
+				tween(pageContainer, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+					Position = UDim2.new(0, 0, 0, 0),
+					GroupTransparency = 0
+				})
 			else
 				tween(tabBtn, TweenInfo.new(0.2), {TextColor3 = PALETTE.Muted})
 				indicator.Visible = false
-				pageContainer.Visible = false
+				
+				if pageContainer.Visible then
+					local t = tween(pageContainer, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+						Position = UDim2.new(0, -15, 0, 0),
+						GroupTransparency = 1
+					})
+					t.Completed:Connect(function()
+						if ActiveTab ~= TabAPI then
+							pageContainer.Visible = false
+						end
+					end)
+				end
 			end
 		end
 
