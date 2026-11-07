@@ -26,17 +26,23 @@ pcall(function()
         local FONT_FILE    = "superwhales.ttf"
         local FONT_JSON    = "superwhales.json"
 
+        -- Validar descarga para evitar guardar HTML corrupto
         if not isfile(FONT_FILE) then
-            writefile(FONT_FILE, game:HttpGet(FONT_URL))
+            local success, res = pcall(function() return game:HttpGet(FONT_URL) end)
+            if success and res and not string.find(res, "<html") and not string.find(res, "<DOCTYPE") then
+                writefile(FONT_FILE, res)
+            end
         end
         
-        writefile(FONT_JSON, HttpService:JSONEncode({
-            name  = FONT_NAME,
-            faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
-        }))
-        
-        local success, newFont = pcall(function() return Font.new(getcustomasset(FONT_JSON)) end)
-        if success and newFont then CUSTOM_FONT = newFont end
+        if isfile(FONT_FILE) then
+            writefile(FONT_JSON, HttpService:JSONEncode({
+                name  = FONT_NAME,
+                faces = { { name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(FONT_FILE) } }
+            }))
+            
+            local success, newFont = pcall(function() return Font.new(getcustomasset(FONT_JSON)) end)
+            if success and newFont then CUSTOM_FONT = newFont end
+        end
     end
 end)
 
