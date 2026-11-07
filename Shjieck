@@ -47,7 +47,6 @@ if not Whitelist[playerName] then
     return
 end
 
--- Forzar actualización de librería (por si acaso)
 local UILibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/z4msc120/-m4Qx9vT2kL_071/refs/heads/main/xq09vL2n7Kp?v=15"))()
 
 local TRAIL_OLD_BLUE = Color3.fromRGB(20, 70, 200); local TRAIL_OLD_PINK = Color3.fromRGB(255, 70, 190); local TRAIL_OLD_RED = Color3.fromRGB(180, 20, 20); local TRAIL_OLD_YELLOW = Color3.fromRGB(255, 220, 40)
@@ -56,7 +55,6 @@ local TRAIL_VOID_PINK = Color3.fromRGB(255, 105, 180); local TRAIL_VOID_BLUE = C
 local TRAIL_MATRIX_BLUE = Color3.fromRGB(30, 80, 220); local TRAIL_MATRIX_WHITE = Color3.fromRGB(255, 255, 255); local TRAIL_MATRIX_PINK = Color3.fromRGB(255, 80, 190); local TRAIL_MATRIX_CYAN = Color3.fromRGB(130, 235, 255)
 local TRAIL_MATRIX_RED = Color3.fromRGB(255, 40, 40); local TRAIL_ORANGE = Color3.fromRGB(255, 130, 20); local TRAIL_GREY = Color3.fromRGB(120, 120, 120)
 
--- NUEVOS COLORES PARA MMS SCOPES
 local TRAIL_CRYSTAL_CYAN = Color3.fromRGB(130, 235, 255)
 local TRAIL_CRYSTAL_PINK = Color3.fromRGB(255, 105, 180)
 local TRAIL_LIGHT_YELLOW = Color3.fromRGB(255, 255, 50)
@@ -74,7 +72,6 @@ local TRAIL_PRESETS = {
     Jack       = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))})},
     Coco       = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 140, 0)), ColorSequenceKeypoint.new(1, Color3.fromRGB(128, 0, 128))})},
     Addams     = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)), ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))})},
-    -- NUEVOS PRESETS
     CrystalMix = {ColorSeq = ColorSequence.new({ColorSequenceKeypoint.new(0, TRAIL_CRYSTAL_CYAN), ColorSequenceKeypoint.new(1, TRAIL_CRYSTAL_PINK)})},
     LightYellow= {Color = TRAIL_LIGHT_YELLOW},
     AeroGreen  = {Color = TRAIL_AERO_GREEN},
@@ -109,7 +106,6 @@ local VOID_TEXTURES = {
     {Label = "Coco", ID = "104707398257454", Trail = "Coco"}, {Label = "Addams Family", ID = "121431974108410", Trail = "Addams"}
 }
 
--- ACTUALIZADO: Sin Champulse y con los nuevos colores asignados
 local MMS_TEXTURES = {
     {Label = "Creator", ID = "119439781607263", Trail = "Creator"},
     {Label = "Lightscope", ID = "90098666044011", Trail = "LightYellow"},
@@ -268,12 +264,10 @@ for _, info in ipairs(OLD_TEXTURES) do
     end)
 end
 
--- PESTAÑA MMS SCOPES
 MmsTab:AddSection("MMS Textures")
 for _, info in ipairs(MMS_TEXTURES) do
     MmsTab:AddButton(info.Label, function()
         local p = TRAIL_PRESETS[info.Trail] or {}
-        -- Aplica la textura tanto a Matrix como a Void a la vez
         selectedTextureMatrix, selectedTextureVoid = info.ID, info.ID
         selectedTrailRainbowMatrix, selectedTrailRainbowVoid = p.Rainbow or false, p.Rainbow or false
         if p.Rainbow then selectedTrailColorMatrix, selectedTrailColorVoid = nil, nil
